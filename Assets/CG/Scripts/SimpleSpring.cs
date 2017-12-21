@@ -32,7 +32,11 @@ public class SimpleSpring : MonoBehaviour {
 
     // Update is called once per frame
     void Update () {
+        if (pivot == null)
+            return;
         Vector3 dir = logic.transform.position - pivot.transform.position;
+        
+        //Nao desliza :)
         if (isColiding && dir.y > 0)
             dir = new Vector3(dir.x, 0, dir.z);
 

@@ -12,6 +12,7 @@ public class Stackable : PhysicalObject {
 		Stackable collisionStackable = collision.gameObject.GetComponent<Stackable> ();
 		PhysicalObject collisionObject = collision.gameObject.GetComponent<PhysicalObject> ();
 
+        //Other OBJ
 		if (collisionStackable != null) {
 
 			if (collisionStackable.baseStackable != null) {
@@ -21,7 +22,9 @@ public class Stackable : PhysicalObject {
 					baseStackable = collision.gameObject;
 				}
 			}
-		} else if (collisionObject != null) {
+           
+		}//PODIUM!
+        else if (collisionObject != null) {
 
 			if (collision.gameObject.transform.position.y < transform.position.y) {
 

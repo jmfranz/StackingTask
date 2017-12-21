@@ -12,14 +12,14 @@ public class notifyCollision : MonoBehaviour {
 
     private void OnCollisionEnter(Collision collision)
     {
-        Debug.Log("Enter");
+        if(this.transform.position.y - collision.transform.position.y > 0)
         if (collisionEnterEvent != null)
             collisionEnterEvent.Invoke();
     }
 
     private void OnCollisionExit(Collision collision)
     {
-        Debug.Log("Exit");
+        //Debug.Log("Exit");
         if (collisionExitEvent != null)
             collisionExitEvent.Invoke();
     }

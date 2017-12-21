@@ -13,7 +13,9 @@ public class Grab : MonoBehaviour {
 
     private GameObject imaginary;
     private GameObject logicObject;
+    private GameObject pivot;
     private List<Stackable> stackList;
+    private Dictionary<string, float> masses;
 
     private Hand.AttachmentFlags attachmentFlags = Hand.defaultAttachmentFlags & (~Hand.AttachmentFlags.SnapOnAttach) & (~Hand.AttachmentFlags.DetachOthers);
     private Material startMaterial;
@@ -29,6 +31,9 @@ public class Grab : MonoBehaviour {
     void Start()
     {
         startMaterial = this.GetComponent<MeshRenderer>().material;
+        masses = new Dictionary<string, float>();
+        foreach (var obj in FindObjectsOfType<Stackable>())
+            masses.Add(obj.name, obj.GetComponent<Rigidbody>().mass);
     }
 
 
@@ -65,10 +70,10 @@ public class Grab : MonoBehaviour {
 
                 //Find the equivalent logic obj
                 logicObject = GameObject.Find(this.transform.name + " Logic");
-                findStack();
+                FindStack();
 
                 //Creates a pivot point for the manipulation
-                var pivot = new GameObject("Pivot");
+                pivot = new GameObject("Pivot");
                 //Sets the pivot as child of the hand
                 pivot.transform.position = hand.transform.position;
                 pivot.transform.rotation = hand.transform.rotation;
@@ -123,18 +128,35 @@ public class Grab : MonoBehaviour {
             logicRb.drag = oldDrag;
             logicRb.angularDrag = oldAngularDrag;
 
+            //Remove its mass and set tag to free falling option
+            //NOPE!
+            var fallManager = logicObject.gameObject.AddComponent<FreeFallingManager>();
+
+
             // Detach this object from the hand
             hand.DetachObject(gameObject);
             // Call this to undo HoverLock
             hand.HoverUnlock(GetComponent<Interactable>());
+
+            var joint = logicObject.GetComponent<FixedJoint>();
+            if (joint != null)
+                Destroy(joint);
+
             foreach (var obj in stackList)
             {
-                obj.transform.parent = GameObject.Find("Logic Representations (DO NOT EDIT)").transform.GetChild(1).transform;
-                obj.GetComponent<Rigidbody>().isKinematic = false;
-                obj.GetComponent<Collider>().isTrigger = false;
+
+                joint = obj.GetComponent<FixedJoint>();
+                if (joint != null)
+                    Destroy(joint);
+                obj.GetComponent<Rigidbody>().mass = masses[obj.name];
+
+
                 var visual = GameObject.Find(obj.name.Substring(0, obj.name.Length - 6));
                 visual.gameObject.GetComponent<MeshRenderer>().material = startMaterial;
             }
+
+
+            Destroy(pivot);
         }
 
     }
@@ -179,25 +201,34 @@ public class Grab : MonoBehaviour {
     {
     }
 
-    private void OnGUI()
-    {
-        if (GUILayout.Button("HUE"))
-            findStack();
-    }
 
-    void findStack()
+    public void FindStack()
     {
         stackList = new List<Stackable>();
         RecursiveFind(logicObject.GetComponent<Stackable>(), ref stackList);
-        foreach(var obj in stackList)
+        stackList.Reverse();
+
+        if (stackList.Count > 0)
         {
-            obj.transform.parent = logicObject.transform;
-            obj.GetComponent<Rigidbody>().isKinematic = true;
-            obj.GetComponent<Collider>().isTrigger = true;
-            var visual = GameObject.Find(obj.name.Substring(0, obj.name.Length - 6));
-            visual.gameObject.GetComponent<MeshRenderer>().material = hoverMat;
+            var joint = logicObject.gameObject.AddComponent<FixedJoint>();
+            joint.connectedBody = stackList[0].GetComponent<Rigidbody>();
+            joint.connectedBody.mass = 0;
+
+            for (int i = 0; i < stackList.Count - 1; i++)
+            {
+                var obj = stackList[i];
+                var innerJoint = obj.gameObject.AddComponent<FixedJoint>();
+                innerJoint.connectedBody = stackList[i+1].GetComponent<Rigidbody>();
+                innerJoint.connectedBody.mass = 0;
+
+                var visual = GameObject.Find(obj.name.Substring(0, obj.name.Length - 6));
+                visual.gameObject.GetComponent<MeshRenderer>().material = hoverMat;
+            }
+
         }
-    }
+
+
+        }
 
     void RecursiveFind(Stackable baseObject, ref List<Stackable> list)
     {
