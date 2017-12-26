@@ -21,15 +21,15 @@ public class FreeFallingManager : MonoBehaviour
     //ALWAYS TOP
     private void OnCollisionEnter(Collision collision)
     {
-        RecursiveFind(collision.gameObject.GetComponent<Stackable>(), ref stackList);
-        Debug.Log("isflying: " + stackList.Count);
 
         if (collision.gameObject.name.Equals("Podium") || collision.gameObject.name.Equals("Platform"))
         {
             Destroy(this);
             return;
-
         }
+
+        RecursiveFind(collision.gameObject.GetComponent<Stackable>(), ref stackList);
+        Debug.Log("isflying: " + stackList.Count);
 
 
         this.GetComponent<Rigidbody>().mass = 0;

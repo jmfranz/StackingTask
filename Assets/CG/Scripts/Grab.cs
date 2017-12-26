@@ -74,9 +74,10 @@ public class Grab : MonoBehaviour {
 
                 //Creates a pivot point for the manipulation
                 pivot = new GameObject("Pivot");
+
                 //Sets the pivot as child of the hand
-                pivot.transform.position = hand.transform.position;
-                pivot.transform.rotation = hand.transform.rotation;
+                pivot.transform.position = this.transform.position;
+                pivot.transform.rotation = this.transform.rotation;
                 pivot.transform.parent = hand.transform;
 
                 //Instantiate and imaginary god-object
@@ -130,7 +131,8 @@ public class Grab : MonoBehaviour {
 
             //Remove its mass and set tag to free falling option
             //NOPE!
-            var fallManager = logicObject.gameObject.AddComponent<FreeFallingManager>();
+            if(logicObject.gameObject.GetComponent<FreeFallingManager>() == null)
+                logicObject.gameObject.AddComponent<FreeFallingManager>();
 
 
             // Detach this object from the hand
