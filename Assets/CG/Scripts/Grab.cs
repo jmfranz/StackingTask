@@ -14,8 +14,8 @@ public class Grab : MonoBehaviour {
     private GameObject imaginary;
     private GameObject logicObject;
     private GameObject pivot;
-    private List<Stackable> stackList;
-    private Dictionary<string, float> masses;
+    public List<Stackable> stackList;
+    public Dictionary<string, float> masses;
 
     private Hand.AttachmentFlags attachmentFlags = Hand.defaultAttachmentFlags & (~Hand.AttachmentFlags.SnapOnAttach) & (~Hand.AttachmentFlags.DetachOthers);
     private Material startMaterial;
@@ -65,8 +65,9 @@ public class Grab : MonoBehaviour {
             if (hand.currentAttachedObject != gameObject)
             {
 
-                //hand.controller.TriggerHapticPulse();
-                    
+                hand.controller.TriggerHapticPulse();
+                hand.controller.TriggerHapticPulse();
+                hand.controller.TriggerHapticPulse();
 
                 //Find the equivalent logic obj
                 logicObject = GameObject.Find(this.transform.name + " Logic");
@@ -247,9 +248,6 @@ public class Grab : MonoBehaviour {
         }
         
     }
-
-
-
 
 }
 

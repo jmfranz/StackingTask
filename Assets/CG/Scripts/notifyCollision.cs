@@ -12,7 +12,7 @@ public class notifyCollision : MonoBehaviour {
 
     private void OnCollisionEnter(Collision collision)
     {
-        if(this.transform.position.y - collision.transform.position.y > 0)
+        //if(this.transform.position.y - collision.transform.position.y > 0)
         if (collisionEnterEvent != null)
             collisionEnterEvent.Invoke();
     }

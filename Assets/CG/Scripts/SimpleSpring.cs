@@ -8,12 +8,13 @@ public class SimpleSpring : MonoBehaviour {
     public GameObject pivot;
     public Quaternion offset;
 
+    public float debugv = 0;
     public GameObject[] stack;
 
     [Range(0, 1000)]
     public int k;
 
-    bool isColiding;
+    public bool isColiding;
 
 	// Use this for initialization
 	void Start () {
@@ -31,15 +32,15 @@ public class SimpleSpring : MonoBehaviour {
     }
 
     // Update is called once per frame
-    void Update () {
+    void FixedUpdate () {
         if (pivot == null)
             return;
         Vector3 dir = logic.transform.position - pivot.transform.position;
-        
-        //Nao desliza :)
-        if (isColiding && dir.y > 0)
-            dir = new Vector3(dir.x, 0, dir.z);
 
+        //Nao desliza :)
+        
+        if (isColiding && dir.y > 0)
+            dir = new Vector3(dir.x, 0.003f, dir.z);
         logic.GetComponent<Rigidbody>().AddForce(dir * -k);
         //var inv = Quaternion.Inverse(offset) *  pivot.transform.rotation;
         ////inv.w = -1 * inv.w;
