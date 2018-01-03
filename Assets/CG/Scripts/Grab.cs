@@ -18,7 +18,7 @@ public class Grab : MonoBehaviour {
     public Dictionary<string, float> masses;
 
     private Hand.AttachmentFlags attachmentFlags = Hand.defaultAttachmentFlags & (~Hand.AttachmentFlags.SnapOnAttach) & (~Hand.AttachmentFlags.DetachOthers);
-    private Material startMaterial;
+    private Color materialOriginalColor;
 
     //Drag values from the original logic objects
     float oldDrag, oldAngularDrag;
@@ -30,7 +30,10 @@ public class Grab : MonoBehaviour {
 
     void Start()
     {
-        startMaterial = this.GetComponent<MeshRenderer>().material;
+
+
+        materialOriginalColor = GetComponent<Renderer>().material.color;
+
         masses = new Dictionary<string, float>();
         foreach (var obj in FindObjectsOfType<Stackable>())
             masses.Add(obj.name, obj.GetComponent<Rigidbody>().mass);
@@ -42,7 +45,7 @@ public class Grab : MonoBehaviour {
     //-------------------------------------------------
     private void OnHandHoverBegin(Hand hand)
     {
-        this.GetComponent<MeshRenderer>().material = hoverMat;
+        this.GetComponent<MeshRenderer>().material.SetColor("_Color", Color.green);
     }
 
 
@@ -51,7 +54,7 @@ public class Grab : MonoBehaviour {
     //-------------------------------------------------
     private void OnHandHoverEnd(Hand hand)
     {
-        this.GetComponent<MeshRenderer>().material = startMaterial;
+        this.GetComponent<Renderer>().material.SetColor("_Color", materialOriginalColor);
     }
 
 
@@ -155,7 +158,7 @@ public class Grab : MonoBehaviour {
 
 
                 var visual = GameObject.Find(obj.name.Substring(0, obj.name.Length - 6));
-                visual.gameObject.GetComponent<MeshRenderer>().material = startMaterial;
+                visual.gameObject.GetComponent<Renderer>().material.SetColor("_Color", Color.green);
             }
 
 
@@ -225,7 +228,7 @@ public class Grab : MonoBehaviour {
                 innerJoint.connectedBody.mass = 0;
 
                 var visual = GameObject.Find(obj.name.Substring(0, obj.name.Length - 6));
-                visual.gameObject.GetComponent<MeshRenderer>().material = hoverMat;
+                visual.gameObject.GetComponent<Renderer>().material.SetColor("_Color", Color.red);
             }
 
         }
