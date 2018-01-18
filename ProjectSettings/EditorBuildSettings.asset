@@ -5,9 +5,9 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 1
+  - enabled: 0
     path: Assets/3DUI Contest/StackingBlank.unity
     guid: 6bebe1f9849aec649bef8200f90d677c
-  - enabled: 0
+  - enabled: 1
     path: Assets/3DUI Contest/Stacking Scene.unity
     guid: 03d495063f52d4a1b93f6c75a97b816a

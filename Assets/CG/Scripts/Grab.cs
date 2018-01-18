@@ -22,7 +22,7 @@ public class Grab : MonoBehaviour {
 
     //Drag values from the original logic objects
     float oldDrag, oldAngularDrag;
-
+    bool bugado = false;
     //-------------------------------------------------
     void Awake()
     {
@@ -135,9 +135,10 @@ public class Grab : MonoBehaviour {
 
             //Remove its mass and set tag to free falling option
             //NOPE!
-            if(logicObject.gameObject.GetComponent<FreeFallingManager>() == null)
-                logicObject.gameObject.AddComponent<FreeFallingManager>();
-
+            if (bugado) {
+                if (logicObject.gameObject.GetComponent<FreeFallingManager>() == null)
+                    logicObject.gameObject.AddComponent<FreeFallingManager>();
+            }
 
             // Detach this object from the hand
             hand.DetachObject(gameObject);
@@ -158,7 +159,7 @@ public class Grab : MonoBehaviour {
 
 
                 var visual = GameObject.Find(obj.name.Substring(0, obj.name.Length - 6));
-                visual.gameObject.GetComponent<Renderer>().material.SetColor("_Color", Color.green);
+                visual.gameObject.GetComponent<Renderer>().material.SetColor("_Color", materialOriginalColor);
             }
 
 
@@ -220,17 +221,20 @@ public class Grab : MonoBehaviour {
             joint.connectedBody = stackList[0].GetComponent<Rigidbody>();
             joint.connectedBody.mass = 0;
 
-            for (int i = 0; i < stackList.Count - 1; i++)
+            for (int i = 0; i < stackList.Count; i++)
             {
                 var obj = stackList[i];
-                var innerJoint = obj.gameObject.AddComponent<FixedJoint>();
-                innerJoint.connectedBody = stackList[i+1].GetComponent<Rigidbody>();
-                innerJoint.connectedBody.mass = 0;
 
                 var visual = GameObject.Find(obj.name.Substring(0, obj.name.Length - 6));
-                visual.gameObject.GetComponent<Renderer>().material.SetColor("_Color", Color.red);
-            }
+                visual.gameObject.GetComponent<Renderer>().material.SetColor("_Color", Color.green);
 
+                if (i < stackList.Count - 1) {
+                    var innerJoint = obj.gameObject.AddComponent<FixedJoint>();    
+                    innerJoint.connectedBody = stackList[i+1].GetComponent<Rigidbody>();
+                    innerJoint.connectedBody.mass = 0;
+                }
+                
+            }
         }
 
 
@@ -249,7 +253,14 @@ public class Grab : MonoBehaviour {
                         list.Add(obj);
                     }
         }
-        
+
+    }
+
+    void Update() {
+        if (Input.GetKeyDown("space"))
+            if (bugado) bugado = false; else bugado = true;
+
+        Debug.Log(bugado);
     }
 
 }
