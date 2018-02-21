@@ -2,28 +2,33 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class notifyCollision : MonoBehaviour {
+public class NotifyCollision : MonoBehaviour {
 
-    public delegate void collisionEnterDelegate();
-    public event collisionEnterDelegate collisionEnterEvent;
+    //public delegate void collisionEnterDelegate();
+    //public event collisionEnterDelegate collisionEnterEvent;
 
-    public delegate void collisionExitDelegate();
-    public event collisionExitDelegate collisionExitEvent;
+    //public delegate void collisionExitDelegate();
+    //public event collisionExitDelegate collisionExitEvent;
+
+    //public bool isColliding = false;
+
+    GameObject imaginary;
+
+    private void Start() {
+        
+    }
 
     private void OnCollisionEnter(Collision collision)
     {
-        //if(this.transform.position.y - collision.transform.position.y > 0)
-        if (collisionEnterEvent != null)
-            collisionEnterEvent.Invoke();
+        var imaginary = GameObject.FindGameObjectWithTag("Imaginary");
+        if (imaginary.GetComponent<SimpleSpring>() != null)
+            imaginary.GetComponent<SimpleSpring>().isColliding = true;
     }
 
     private void OnCollisionExit(Collision collision)
     {
-        //Debug.Log("Exit");
-        if (collisionExitEvent != null)
-            collisionExitEvent.Invoke();
+        var imaginary = GameObject.FindGameObjectWithTag("Imaginary");
+        if (imaginary.GetComponent<SimpleSpring>() != null)
+            imaginary.GetComponent<SimpleSpring>().isColliding = false;
     }
-
-
-
 }

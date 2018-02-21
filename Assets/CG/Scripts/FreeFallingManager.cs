@@ -19,10 +19,14 @@ public class FreeFallingManager : MonoBehaviour
         //stackList = new List<Stackable>();
 
     }
-    //ALWAYS TOP
-    private void OnCollisionEnter(Collision collision)
-    {
+    void Update() {
+        
+    }
 
+
+    private void OnCollisionStay(Collision collision)
+    {
+        Debug.Log(this.gameObject.name);
         //// Remove this script if the object collide with the podium or plataform 
         //if (collision.gameObject.name.Equals("Podium") || collision.gameObject.name.Equals("Platform"))
         //{
@@ -39,13 +43,11 @@ public class FreeFallingManager : MonoBehaviour
         //joint.connectedBody = collision.gameObject.GetComponent<Rigidbody>();
 
 
-
         ////Destroy(this);
 
         bool isOnPodium = FindPodium(collision.gameObject.GetComponent<Stackable>());
 
-
-        // Remove this script if the object collide with the podium or plataform 
+        // Remove this script if the stack is on top of the podium or if the object collide with the podium or plataform
         if (isOnPodium || collision.gameObject.name.Equals("Podium") || collision.gameObject.name.Equals("Platform"))
         {
             Destroy(this);
@@ -54,6 +56,8 @@ public class FreeFallingManager : MonoBehaviour
 
         // It should be an iteractable object 
         if (collision.gameObject.GetComponent<Stackable>() == null) return;
+
+        if (this.gameObject.GetComponent<FreeFallingManager>() == null) return;
 
         if (collision.gameObject.GetComponent<FixedJoint>() == null)
         {
@@ -68,10 +72,11 @@ public class FreeFallingManager : MonoBehaviour
     private void OtherDeatch(Hand hand)
     {
         Destroy(joint);
+        this.gameObject.GetComponent<Rigidbody>().mass = 1;
         otherHand.onDetachedFromHand -= OtherDeatch;
-        this.GetComponent<Rigidbody>().mass = 1;
         Debug.Log(this.gameObject.name);
-        Destroy(this);
+        //if (this.gameObject.GetComponent<FreeFallingManager>() != null)
+        //    Destroy(this);
     }
 
 
@@ -102,16 +107,17 @@ public class FreeFallingManager : MonoBehaviour
         
         yield return new WaitForSeconds(0.05f); 
         Debug.Log(col);
-        this.GetComponent<Rigidbody>().mass = 0;
+         
+        //this.gameObject.GetComponent<Rigidbody>().mass = 0.1f;
         joint = col.gameObject.AddComponent<FixedJoint>();
         joint.connectedBody = this.gameObject.GetComponent<Rigidbody>();
 
         col.gameObject.GetComponent<Stackable>().VisualRepresentation.gameObject.GetComponent<Grab>().stackList.Add(gameObject.GetComponent<Stackable>());
         //col.gameObject.GetComponent<Stackable>().VisualRepresentation.gameObject.GetComponent<Grab>().masses.Add(name, gameObject.GetComponent<Rigidbody>().mass);
-        otherHand = col.gameObject.GetComponent<Stackable>().VisualRepresentation.gameObject.GetComponent<Interactable>();
-        otherHand.onDetachedFromHand += OtherDeatch;
-        
-        Destroy(this);
+        //otherHand = col.gameObject.GetComponent<Stackable>().VisualRepresentation.gameObject.GetComponent<Interactable>();
+        //otherHand.onDetachedFromHand += OtherDeatch;
+        if (this.gameObject.GetComponent<FreeFallingManager>() != null)
+            Destroy(this);
 
     }
 

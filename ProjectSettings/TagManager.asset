@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Falling
   - Stacked
+  - Imaginary
   layers:
   - Default
   - TransparentFX

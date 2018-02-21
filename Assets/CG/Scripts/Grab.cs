@@ -22,7 +22,7 @@ public class Grab : MonoBehaviour {
 
     //Drag values from the original logic objects
     float oldDrag, oldAngularDrag;
-    bool bugado = false;
+
     //-------------------------------------------------
     void Awake()
     {
@@ -63,62 +63,50 @@ public class Grab : MonoBehaviour {
     //-------------------------------------------------
     private void HandHoverUpdate(Hand hand)
     {
+
         if (hand.GetStandardInteractionButtonDown() || ((hand.controller != null) && hand.controller.GetPressDown(Valve.VR.EVRButtonId.k_EButton_Grip)))
         {
             if (hand.currentAttachedObject != gameObject)
             {
 
                 hand.controller.TriggerHapticPulse();
-                hand.controller.TriggerHapticPulse();
-                hand.controller.TriggerHapticPulse();
 
                 //Find the equivalent logic obj
                 logicObject = GameObject.Find(this.transform.name + " Logic");
                 FindStack();
 
-                //Creates a pivot point for the manipulation
-                pivot = new GameObject("Pivot");
-
-                //Sets the pivot as child of the hand
-                pivot.transform.position = this.transform.position;
-                pivot.transform.rotation = this.transform.rotation;
-                pivot.transform.parent = hand.transform;
-
                 //Instantiate and imaginary god-object
                 imaginary = Instantiate(imaginaryPrefab);
-                var simpleSpring = imaginary.GetComponent<SimpleSpring>();
-                
-                //Attaches a simple spring joint from the god-objce to the logic representation
-                simpleSpring.logic = logicObject;
-                simpleSpring.pivot = pivot;
-                simpleSpring.offset = logicObject.transform.rotation;
 
                 //Sets the god-object position to the same as the visual representation
-                imaginary.transform.position = gameObject.transform.position;
-                imaginary.transform.rotation = gameObject.transform.rotation;
-                imaginary.transform.parent = gameObject.transform;
-
-                //Stores the logic object drags
-                var logicRb = logicObject.GetComponent<Rigidbody>();
-                oldAngularDrag = logicRb.angularDrag;
-                oldDrag = logicRb.drag;
-                //Sets to values that helps our spring to converge
-                logicRb.drag = 15;
-                logicRb.angularDrag = 5;
+                imaginary.transform.position = this.transform.position;
+                imaginary.transform.rotation = this.transform.rotation;
+                imaginary.transform.parent = hand.transform;
 
                 //Disable the logic object gravity so we can move it around freely
-                logicObject.GetComponent<Rigidbody>().useGravity = false;
+                var logicRb = logicObject.GetComponent<Rigidbody>();
+                logicRb.useGravity = false;
+
+                //Disable the gravity of stacked objects
+                foreach (var obj in stackList) {
+                    obj.GetComponent<Rigidbody>().useGravity = false;
+                }
+
                 //Add a script that inform us if the object is colliding
-                var notify = logicObject.AddComponent<notifyCollision>();
-                notify.collisionEnterEvent += simpleSpring.collisionEnter;
-                notify.collisionExitEvent += simpleSpring.collisionExit;
+                logicObject.AddComponent<NotifyCollision>();
+
+                var simpleSpring = imaginary.GetComponent<SimpleSpring>();
+                //Attaches a simple spring joint from the god-objce to the logic representation
+                simpleSpring.logic = logicObject;
+                simpleSpring.pivot = imaginary;
+                simpleSpring.offset = logicObject.transform.rotation;
 
                 // Call this to continue receiving HandHoverUpdate messages,
                 // and prevent the hand from hovering over anything else
                 hand.HoverLock(GetComponent<Interactable>());
 
                 // Attach this object to the hand
-                hand.AttachObject(gameObject, attachmentFlags);
+                hand.AttachObject(imaginary, attachmentFlags);
                 
                 
             }
@@ -126,19 +114,19 @@ public class Grab : MonoBehaviour {
         if (hand.GetStandardInteractionButtonUp())// || hand.controller.GetPressUp(Valve.VR.EVRButtonId.k_EButton_Grip) && hand.currentAttachedObject != null)
         {
             Destroy(imaginary);
-            Destroy(logicObject.GetComponent<notifyCollision>());
+            Destroy(logicObject.GetComponent<NotifyCollision>());
             //Resets original settings of the logic object
             logicObject.GetComponent<Rigidbody>().useGravity = true;
-            var logicRb = logicObject.GetComponent<Rigidbody>();
-            logicRb.drag = oldDrag;
-            logicRb.angularDrag = oldAngularDrag;
+            //var logicRb = logicObject.GetComponent<Rigidbody>();
+            //logicRb.drag = oldDrag;
+            //logicRb.angularDrag = oldAngularDrag;
 
             //Remove its mass and set tag to free falling option
             //NOPE!
-            if (bugado) {
-                if (logicObject.gameObject.GetComponent<FreeFallingManager>() == null)
-                    logicObject.gameObject.AddComponent<FreeFallingManager>();
-            }
+
+            //if (logicObject.gameObject.GetComponent<FreeFallingManager>() == null)
+            //    logicObject.gameObject.AddComponent<FreeFallingManager>();
+
 
             // Detach this object from the hand
             hand.DetachObject(gameObject);
@@ -155,7 +143,8 @@ public class Grab : MonoBehaviour {
                 joint = obj.GetComponent<FixedJoint>();
                 if (joint != null)
                     Destroy(joint);
-                obj.GetComponent<Rigidbody>().mass = masses[obj.name];
+                //obj.GetComponent<Rigidbody>().mass = masses[obj.name];
+                obj.GetComponent<Rigidbody>().useGravity = true;
 
 
                 var visual = GameObject.Find(obj.name.Substring(0, obj.name.Length - 6));
@@ -219,7 +208,7 @@ public class Grab : MonoBehaviour {
         {
             var joint = logicObject.gameObject.AddComponent<FixedJoint>();
             joint.connectedBody = stackList[0].GetComponent<Rigidbody>();
-            joint.connectedBody.mass = 0;
+            //joint.connectedBody.mass = 0;
 
             for (int i = 0; i < stackList.Count; i++)
             {
@@ -231,7 +220,7 @@ public class Grab : MonoBehaviour {
                 if (i < stackList.Count - 1) {
                     var innerJoint = obj.gameObject.AddComponent<FixedJoint>();    
                     innerJoint.connectedBody = stackList[i+1].GetComponent<Rigidbody>();
-                    innerJoint.connectedBody.mass = 0;
+                    //innerJoint.connectedBody.mass = 0;
                 }
                 
             }
@@ -257,10 +246,6 @@ public class Grab : MonoBehaviour {
     }
 
     void Update() {
-        if (Input.GetKeyDown("space"))
-            if (bugado) bugado = false; else bugado = true;
-
-        Debug.Log(bugado);
     }
 
 }
