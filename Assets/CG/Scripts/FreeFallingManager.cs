@@ -57,7 +57,7 @@ public class FreeFallingManager : MonoBehaviour
         // It should be an iteractable object 
         if (collision.gameObject.GetComponent<Stackable>() == null) return;
 
-        if (this.gameObject.GetComponent<FreeFallingManager>() == null) return;
+        //if (this.gameObject.GetComponent<FreeFallingManager>() == null) return;
 
         if (collision.gameObject.GetComponent<FixedJoint>() == null)
         {

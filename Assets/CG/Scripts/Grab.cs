@@ -13,15 +13,13 @@ public class Grab : MonoBehaviour {
 
     private GameObject imaginary;
     private GameObject logicObject;
-    private GameObject pivot;
+
     public List<Stackable> stackList;
-    //public Dictionary<string, float> masses;
+
 
     private Hand.AttachmentFlags attachmentFlags = Hand.defaultAttachmentFlags & (~Hand.AttachmentFlags.SnapOnAttach) & (~Hand.AttachmentFlags.DetachOthers);
     private Color materialOriginalColor;
 
-    //Drag values from the original logic objects
-    //float oldDrag, oldAngularDrag;
 
     //-------------------------------------------------
     void Awake() {
@@ -31,9 +29,6 @@ public class Grab : MonoBehaviour {
 
         materialOriginalColor = GetComponent<Renderer>().material.color;
 
-        //masses = new Dictionary<string, float>();
-        //foreach (var obj in FindObjectsOfType<Stackable>())
-        //    masses.Add(obj.name, obj.GetComponent<Rigidbody>().mass);
     }
 
 
@@ -65,7 +60,19 @@ public class Grab : MonoBehaviour {
 
                 //Find the equivalent logic obj
                 logicObject = GameObject.Find(this.transform.name + " Logic");
-                AttachAboveObjects();
+
+                // Check if the other hand has objects attached. 
+                // If so, we need to find out if the other hand is grabbing the object grabbed with this hand.
+                // If it is been grabbed, we need to remove the joint that are fixing it to the other hand and attach to this hand.
+
+                if (hand.otherHand.gameObject.GetComponentInChildren<SimpleSpring>() != null) { //if the other hand is grabbing an object
+                    //Find this object in the other hand
+                    var otherHandObj = hand.otherHand.gameObject.GetComponentInChildren<SimpleSpring>().logic;
+                    DetachFromOtherHand(logicObject, otherHandObj);                    
+                }
+                   
+                
+                AttachAboveObjects(logicObject.GetComponent<Stackable>());
 
                 //Instantiate and imaginary god-object
                 imaginary = Instantiate(imaginaryPrefab);
@@ -78,11 +85,6 @@ public class Grab : MonoBehaviour {
                 //Disable the logic object gravity so we can move it around freely
                 var logicRb = logicObject.GetComponent<Rigidbody>();
                 logicRb.useGravity = false;
-
-                //Disable the gravity of stacked objects
-                //foreach (var obj in stackList) {
-                //    obj.GetComponent<Rigidbody>().useGravity = false;
-                //}
 
                 //Add a script that inform us if the object is colliding
                 logicObject.AddComponent<NotifyCollision>();
@@ -111,10 +113,6 @@ public class Grab : MonoBehaviour {
             logicObject.GetComponent<Rigidbody>().useGravity = true;
             DetachAboveObjects(logicObject);
 
-            //var logicRb = logicObject.GetComponent<Rigidbody>();
-            //logicRb.drag = oldDrag;
-            //logicRb.angularDrag = oldAngularDrag;
-
             //Remove its mass and set tag to free falling option
             //NOPE!
 
@@ -123,33 +121,31 @@ public class Grab : MonoBehaviour {
 
 
             // Detach this object from the hand
-            hand.DetachObject(gameObject);
+            hand.DetachObject(imaginary);
             // Call this to undo HoverLock
             hand.HoverUnlock(GetComponent<Interactable>());
 
-            var joint = logicObject.GetComponent<FixedJoint>();
-            if (joint != null)
-                Destroy(joint);
-
-            foreach (var obj in stackList) {
-
-                joint = obj.GetComponent<FixedJoint>();
-                if (joint != null)
-                    Destroy(joint);
-                //obj.GetComponent<Rigidbody>().mass = masses[obj.name];
-                obj.GetComponent<Rigidbody>().useGravity = true;
-
-
-                var visual = GameObject.Find(obj.name.Substring(0, obj.name.Length - 6));
-                visual.gameObject.GetComponent<Renderer>().material.SetColor("_Color", materialOriginalColor);
-            }
-
-
-            Destroy(pivot);
         }
 
     }
 
+
+    void DetachFromOtherHand(GameObject thisHandObj, GameObject otherHandObj) {
+
+        var joints = otherHandObj.GetComponents<FixedJoint>();
+        if (joints == null) return;
+        foreach (var joint in joints) {
+            if (joint != null) {
+                var aboveObjInOtherHand = joint.connectedBody.gameObject;
+                if (thisHandObj.name.Equals(aboveObjInOtherHand.name)) {
+                    Destroy(joint);
+                    break;
+                } else
+                    DetachFromOtherHand(thisHandObj, aboveObjInOtherHand);
+
+            }
+        }
+    }
 
     //-------------------------------------------------
     // Called when this GameObject becomes attached to the hand
@@ -188,73 +184,37 @@ public class Grab : MonoBehaviour {
     private void OnHandFocusLost(Hand hand) {
     }
 
-    Dictionary<string, bool> visited;
-
-
-    public void newAttachAboveObjects() {
-
-
-    }
-
+    //-------------------------------------------------
+    // Search for objects stacked above that are fixed with a joint and detach
+    //-------------------------------------------------
     public void DetachAboveObjects(GameObject obj) {
 
-        var joint = obj.GetComponent<FixedJoint>();
-        if ( joint != null) {
-            var connectedObj = joint.connectedBody.gameObject;
-            DetachAboveObjects(connectedObj);
-            Destroy(joint);
-            connectedObj.GetComponent<Rigidbody>().useGravity = true;
-            //connectedObj. .VisualRepresentation.gameObject.GetComponent<Renderer>().material.SetColor("_Color", Color.green);
+        var joints = obj.GetComponents<FixedJoint>();
+        if (joints == null) return;
+        foreach (var joint in joints) {
+            if (joint != null) {
+                var connectedObj = joint.connectedBody.gameObject;
+                DetachAboveObjects(connectedObj);
+                Destroy(joint);
+                connectedObj.GetComponent<Rigidbody>().useGravity = true;
+                var objVisual = connectedObj.GetComponent<Stackable>().VisualRepresentation;
+                objVisual.gameObject.GetComponent<Renderer>().material.SetColor("_Color", objVisual.GetComponent<Grab>().materialOriginalColor);
+            }
         }
     }
 
-    public void AttachAboveObjects() {
+    //-------------------------------------------------
+    // Search for objects stacked above the grabbed object, attach them with the grabbed object and change their material color.
+    //-------------------------------------------------
+    public void AttachAboveObjects(Stackable baseObj) {
 
-
-        //stackList = new List<Stackable>();
-        //RecursiveFind(logicObject.GetComponent<Stackable>(), ref stackList);
-        //stackList.Reverse();
-        RecursiveFind2(logicObject.GetComponent<Stackable>());
-
-        //visited = new Dictionary<string, bool>();
-        //foreach(var s in stackList) {
-        //    visited.Add(s.name, false);
-        //}
-
-        //foreach (var s in stackList)
-        //    DFS(s);
-
-        //if (stackList.Count > 0) {
-        //    var joint = logicObject.gameObject.AddComponent<FixedJoint>();
-        //    joint.connectedBody = stackList[0].GetComponent<Rigidbody>();
-        //    //joint.connectedBody.mass = 0;
-
-        //    for (int i = 0; i < stackList.Count; i++) {
-        //        var obj = stackList[i];
-        //        var visual = obj.VisualRepresentation;
-
-        //        visual.gameObject.GetComponent<Renderer>().material.SetColor("_Color", Color.green);
-
-        //        if (i < stackList.Count - 1) {
-        //            var innerJoint = obj.gameObject.AddComponent<FixedJoint>();
-        //            innerJoint.connectedBody = stackList[i + 1].GetComponent<Rigidbody>();
-        //            //innerJoint.connectedBody.mass = 0;
-        //        }
-
-        //    }
-        //}
-
-
-    }
-
-    void RecursiveFind2(Stackable baseObject) {
         var logics = GameObject.FindObjectsOfType<Stackable>();
         foreach (var obj in logics) {
             if (obj.baseStackable != null) // if the obj has an obj below
-                if (obj != baseObject) //if the obj is not the grabbed obj
-                    if (obj.baseStackable.name.Equals(baseObject.name)) {
-                        RecursiveFind2(obj);
-                        var joint = baseObject.gameObject.AddComponent<FixedJoint>();
+                if (obj != baseObj) //if the obj is not the grabbed obj
+                    if (obj.baseStackable.name.Equals(baseObj.name)) {
+                        AttachAboveObjects(obj);
+                        var joint = baseObj.gameObject.AddComponent<FixedJoint>();
                         joint.connectedBody = obj.GetComponent<Rigidbody>();
                         obj.VisualRepresentation.gameObject.GetComponent<Renderer>().material.SetColor("_Color", Color.green);
                         obj.GetComponent<Rigidbody>().useGravity = false;
@@ -262,29 +222,6 @@ public class Grab : MonoBehaviour {
         }
     }
 
-    void RecursiveFind(Stackable baseObject, ref List<Stackable> list) {
-        var logics = GameObject.FindObjectsOfType<Stackable>();
-        foreach (var obj in logics) {
-            if (obj.baseStackable != null) // if the obj has an obj below
-                if (obj != baseObject) //if the obj is not the grabbed obj
-                    if (obj.baseStackable.name.Equals(baseObject.name)) {
-                        RecursiveFind(obj, ref list);
-                        list.Add(obj);
-                    }
-        }
-
-    }
-
-    void DFS(Stackable obj) {
-        if (!visited[obj.name]) {
-            visited[obj.name] = true;
-            foreach (var o in obj.VisualRepresentation.GetComponent<Grab>().stackList)
-                DFS(o);
-        }
-    }
-
-    void Update() {
-    }
 
 }
 
