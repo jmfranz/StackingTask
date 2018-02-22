@@ -26,7 +26,7 @@ public class FreeFallingManager : MonoBehaviour
 
     private void OnCollisionStay(Collision collision)
     {
-        Debug.Log(this.gameObject.name);
+        //Debug.Log(this.gameObject.name);
         //// Remove this script if the object collide with the podium or plataform 
         //if (collision.gameObject.name.Equals("Podium") || collision.gameObject.name.Equals("Platform"))
         //{
@@ -106,11 +106,14 @@ public class FreeFallingManager : MonoBehaviour
     {
         
         yield return new WaitForSeconds(0.05f); 
-        Debug.Log(col);
-         
+        //Debug.Log(col);
+
+        var thisRb = this.gameObject.GetComponent<Rigidbody>();
         //this.gameObject.GetComponent<Rigidbody>().mass = 0.1f;
         joint = col.gameObject.AddComponent<FixedJoint>();
-        joint.connectedBody = this.gameObject.GetComponent<Rigidbody>();
+        joint.connectedBody = thisRb;
+
+        thisRb.useGravity = false;
 
         col.gameObject.GetComponent<Stackable>().VisualRepresentation.gameObject.GetComponent<Grab>().stackList.Add(gameObject.GetComponent<Stackable>());
         //col.gameObject.GetComponent<Stackable>().VisualRepresentation.gameObject.GetComponent<Grab>().masses.Add(name, gameObject.GetComponent<Rigidbody>().mass);

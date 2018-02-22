@@ -12,7 +12,7 @@ public class NotifyCollision : MonoBehaviour {
 
     //public bool isColliding = false;
 
-    GameObject imaginary;
+    //GameObject imaginary;
 
     private void Start() {
         
