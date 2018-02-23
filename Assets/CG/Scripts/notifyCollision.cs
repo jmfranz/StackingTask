@@ -14,21 +14,24 @@ public class NotifyCollision : MonoBehaviour {
 
     //GameObject imaginary;
 
+    public bool isColliding;
+    public Collision collidedObj;
+
     private void Start() {
-        
+        isColliding = false;
+        collidedObj = null;
     }
 
     private void OnCollisionEnter(Collision collision)
     {
-        var imaginary = GameObject.FindGameObjectWithTag("Imaginary");
-        if (imaginary.GetComponent<SimpleSpring>() != null)
-            imaginary.GetComponent<SimpleSpring>().isColliding = true;
+        isColliding = true;
+        collidedObj = collision;
+
     }
 
     private void OnCollisionExit(Collision collision)
     {
-        var imaginary = GameObject.FindGameObjectWithTag("Imaginary");
-        if (imaginary.GetComponent<SimpleSpring>() != null)
-            imaginary.GetComponent<SimpleSpring>().isColliding = false;
+        isColliding = false;
+        collidedObj = collision;
     }
 }

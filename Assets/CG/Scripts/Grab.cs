@@ -109,15 +109,17 @@ public class Grab : MonoBehaviour {
         {
             Destroy(imaginary);
             Destroy(logicObject.GetComponent<NotifyCollision>());
-            //Resets original settings of the logic object
-            logicObject.GetComponent<Rigidbody>().useGravity = true;
-            DetachAboveObjects(logicObject);
 
-            //Remove its mass and set tag to free falling option
-            //NOPE!
+            var getLogicObjectCollision = logicObject.GetComponent<NotifyCollision>();
 
-            //if (logicObject.gameObject.GetComponent<FreeFallingManager>() == null)
-            //    logicObject.gameObject.AddComponent<FreeFallingManager>();
+            //If the objects is colliding when it is released AND it is not colliding with the podium AND the stack that the object is being attached is not colliding with the podium 
+            if (getLogicObjectCollision != null && getLogicObjectCollision.isColliding && !getLogicObjectCollision.collidedObj.gameObject.name.Equals("Podium") && !FindPodium(getLogicObjectCollision.collidedObj.gameObject.GetComponent<Stackable>())) {
+                AttachObjectToStack(logicObject, getLogicObjectCollision.collidedObj.gameObject);
+            } else {
+                //Resets original settings of the logic object
+                logicObject.GetComponent<Rigidbody>().useGravity = true;
+                DetachAboveObjects(logicObject);
+            }
 
 
             // Detach this object from the hand
@@ -125,10 +127,17 @@ public class Grab : MonoBehaviour {
             // Call this to undo HoverLock
             hand.HoverUnlock(GetComponent<Interactable>());
 
-        }
 
+        }
     }
 
+
+    void AttachObjectToStack(GameObject thisObj, GameObject baseObj) {
+        var joint = baseObj.gameObject.AddComponent<FixedJoint>();
+        joint.connectedBody = thisObj.GetComponent<Rigidbody>();
+        //thisObj.GetComponent<Rigidbody>().useGravity = false;
+        
+    }
 
     void DetachFromOtherHand(GameObject thisHandObj, GameObject otherHandObj) {
 
@@ -145,43 +154,6 @@ public class Grab : MonoBehaviour {
 
             }
         }
-    }
-
-    //-------------------------------------------------
-    // Called when this GameObject becomes attached to the hand
-    //-------------------------------------------------
-    private void OnAttachedToHand(Hand hand) {
-        Debug.Log("OnAttachedToHand");
-    }
-
-
-    //-------------------------------------------------
-    // Called when this GameObject is detached from the hand
-    //-------------------------------------------------
-    private void OnDetachedFromHand(Hand hand) {
-        Debug.Log("OnDetachedFromHand");
-    }
-
-
-    //-------------------------------------------------
-    // Called every Update() while this GameObject is attached to the hand
-    //-------------------------------------------------
-    private void HandAttachedUpdate(Hand hand) {
-        Debug.Log("HandAttachedUpdate");
-    }
-
-
-    //-------------------------------------------------
-    // Called when this attached GameObject becomes the primary attached object
-    //-------------------------------------------------
-    private void OnHandFocusAcquired(Hand hand) {
-    }
-
-
-    //-------------------------------------------------
-    // Called when another attached GameObject becomes the primary attached object
-    //-------------------------------------------------
-    private void OnHandFocusLost(Hand hand) {
     }
 
     //-------------------------------------------------
@@ -222,6 +194,20 @@ public class Grab : MonoBehaviour {
         }
     }
 
+    bool FindPodium(Stackable obj) {
+        bool found = false;
+        if (obj != null && obj.baseStackable != null) {
+            if (obj.baseStackable.gameObject.name.Equals("Podium"))
+                return true;
+            found = FindPodium(obj.baseStackable.GetComponent<Stackable>());
+        }
+
+        if (found)
+            return true;
+        else
+            return false;
+
+    }
 
 }
 

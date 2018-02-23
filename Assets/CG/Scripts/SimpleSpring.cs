@@ -12,6 +12,7 @@ public class SimpleSpring : MonoBehaviour {
     public GameObject[] stack;
 
     public const int DEFAULT_K = 150;
+
     public bool isColliding;
 
     [Range(0, 1000)]
@@ -19,6 +20,7 @@ public class SimpleSpring : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+        isColliding = logic.GetComponent<NotifyCollision>().isColliding;
         k = DEFAULT_K;
 	}
 

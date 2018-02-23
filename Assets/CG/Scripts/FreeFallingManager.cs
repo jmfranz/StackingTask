@@ -65,8 +65,6 @@ public class FreeFallingManager : MonoBehaviour
             StartCoroutine(WaitToAttach(collision));
         }
 
-        
-
     }
 
     private void OtherDeatch(Hand hand)
