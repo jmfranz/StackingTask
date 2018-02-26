@@ -17,7 +17,7 @@ public class Grab : MonoBehaviour {
 
     private Hand.AttachmentFlags attachmentFlags = Hand.defaultAttachmentFlags & (~Hand.AttachmentFlags.SnapOnAttach) & (~Hand.AttachmentFlags.DetachOthers);
     private Color materialOriginalColor;
-
+    private Color hoverColor, selectColor;
 
     //-------------------------------------------------
     void Awake() {
@@ -26,7 +26,8 @@ public class Grab : MonoBehaviour {
     void Start() {
 
         materialOriginalColor = GetComponent<Renderer>().material.color;
-
+        hoverColor = new Color(0.7f, 1.0f, 0.7f, 1.0f);
+        selectColor = new Color(0.1f, 1.0f, 0.1f, 1.0f);
     }
 
 
@@ -34,7 +35,7 @@ public class Grab : MonoBehaviour {
     // Called when a Hand starts hovering over this object
     //-------------------------------------------------
     private void OnHandHoverBegin(Hand hand) {
-        this.GetComponent<MeshRenderer>().material.SetColor("_Color", Color.green);
+        this.GetComponent<MeshRenderer>().material.SetColor("_Color", hoverColor);
     }
 
 
@@ -55,7 +56,7 @@ public class Grab : MonoBehaviour {
             if (hand.currentAttachedObject != gameObject) {
 
                 hand.controller.TriggerHapticPulse();
-
+                this.GetComponent<Renderer>().material.SetColor("_Color", selectColor);
                 //Find the equivalent logic obj
                 logicObject = GameObject.Find(this.transform.name + " Logic");
 
@@ -117,12 +118,12 @@ public class Grab : MonoBehaviour {
 
             Destroy(imaginary);
             Destroy(logicObject.GetComponent<NotifyCollision>());
+            this.GetComponent<Renderer>().material.SetColor("_Color", hoverColor);
 
             // Detach this object from the hand
             hand.DetachObject(imaginary);
             // Call this to undo HoverLock
             hand.HoverUnlock(GetComponent<Interactable>());
-
 
         }
     }
@@ -183,7 +184,7 @@ public class Grab : MonoBehaviour {
                         if (baseObj.gameObject.GetComponent<FixedJoint>() != null) return;
                         var joint = baseObj.gameObject.AddComponent<FixedJoint>();
                         joint.connectedBody = obj.GetComponent<Rigidbody>();
-                        obj.VisualRepresentation.gameObject.GetComponent<Renderer>().material.SetColor("_Color", Color.green);
+                        obj.VisualRepresentation.gameObject.GetComponent<Renderer>().material.SetColor("_Color", selectColor);
                         obj.GetComponent<Rigidbody>().useGravity = false;
                     }
         }

@@ -9,7 +9,6 @@ public class SimpleSpring : MonoBehaviour {
     public Quaternion offset;
 
     public float debugv = 0;
-    public GameObject[] stack;
 
     public const int DEFAULT_K = 150;
 
@@ -20,14 +19,17 @@ public class SimpleSpring : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-        isColliding = logic.GetComponent<NotifyCollision>().isColliding;
+        
         k = DEFAULT_K;
 	}
 
     // Update is called once per frame
     void FixedUpdate () {
-        if (pivot == null)
-            return;
+        if (pivot == null) return;
+        if (logic.GetComponent<NotifyCollision>() == null) return;
+
+        isColliding = logic.GetComponent<NotifyCollision>().isColliding;
+
         Vector3 dir = logic.transform.position - pivot.transform.position;
 
         //Nao desliza :)
@@ -37,7 +39,7 @@ public class SimpleSpring : MonoBehaviour {
             k = 50;
         } else
             k = DEFAULT_K;
-        //isColiding = false;
+        
         if (dir.magnitude > 0.1f) { dir.Normalize(); dir *= 0.1f; }
         logic.GetComponent<Rigidbody>().velocity = dir * -k * 0.1f;
         
