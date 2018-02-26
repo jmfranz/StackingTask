@@ -107,8 +107,6 @@ public class Grab : MonoBehaviour {
         }
         if (hand.GetStandardInteractionButtonUp())// || hand.controller.GetPressUp(Valve.VR.EVRButtonId.k_EButton_Grip) && hand.currentAttachedObject != null)
         {
-            Destroy(imaginary);
-            Destroy(logicObject.GetComponent<NotifyCollision>());
 
             var getLogicObjectCollision = logicObject.GetComponent<NotifyCollision>();
 
@@ -117,10 +115,12 @@ public class Grab : MonoBehaviour {
                 AttachObjectToStack(logicObject, getLogicObjectCollision.collidedObj.gameObject);
             } else {
                 //Resets original settings of the logic object
-                logicObject.GetComponent<Rigidbody>().useGravity = true;
                 DetachAboveObjects(logicObject);
+                logicObject.GetComponent<Rigidbody>().useGravity = true;
             }
 
+            Destroy(imaginary);
+            Destroy(logicObject.GetComponent<NotifyCollision>());
 
             // Detach this object from the hand
             hand.DetachObject(imaginary);
@@ -167,8 +167,8 @@ public class Grab : MonoBehaviour {
             if (joint != null) {
                 var connectedObj = joint.connectedBody.gameObject;
                 DetachAboveObjects(connectedObj);
-                Destroy(joint);
                 connectedObj.GetComponent<Rigidbody>().useGravity = true;
+                Destroy(joint);
                 var objVisual = connectedObj.GetComponent<Stackable>().VisualRepresentation;
                 objVisual.gameObject.GetComponent<Renderer>().material.SetColor("_Color", objVisual.GetComponent<Grab>().materialOriginalColor);
             }

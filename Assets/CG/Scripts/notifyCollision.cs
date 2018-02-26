@@ -22,10 +22,16 @@ public class NotifyCollision : MonoBehaviour {
         collidedObj = null;
     }
 
-    private void OnCollisionEnter(Collision collision)
+    private void OnCollisionStay(Collision collision)
     {
-        isColliding = true;
         collidedObj = collision;
+        var joint = this.gameObject.GetComponent<FixedJoint>();
+        if (joint != null && joint.connectedBody.gameObject.name.Equals(collision.gameObject.name))
+            isColliding = false;
+        else {
+            isColliding = true;
+            
+        }
 
     }
 
