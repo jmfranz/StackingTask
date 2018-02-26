@@ -10,12 +10,10 @@ public class Grab : MonoBehaviour {
     public GameObject imaginaryPrefab;
     public Material hoverMat;
 
-
     private GameObject imaginary;
     private GameObject logicObject;
 
     public List<Stackable> stackList;
-
 
     private Hand.AttachmentFlags attachmentFlags = Hand.defaultAttachmentFlags & (~Hand.AttachmentFlags.SnapOnAttach) & (~Hand.AttachmentFlags.DetachOthers);
     private Color materialOriginalColor;
@@ -63,15 +61,13 @@ public class Grab : MonoBehaviour {
 
                 // Check if the other hand has objects attached. 
                 // If so, we need to find out if the other hand is grabbing the object grabbed with this hand.
-                // If it is been grabbed, we need to remove the joint that are fixing it to the other hand and attach to this hand.
-
+                // If it is been grabbed, we need to remove the joint that is fixing it to the other hand and attach to this hand.
                 if (hand.otherHand.gameObject.GetComponentInChildren<SimpleSpring>() != null) { //if the other hand is grabbing an object
                     //Find this object in the other hand
                     var otherHandObj = hand.otherHand.gameObject.GetComponentInChildren<SimpleSpring>().logic;
-                    DetachFromOtherHand(logicObject, otherHandObj);                    
+                    DetachFromOtherHand(logicObject, otherHandObj);
                 }
                    
-                
                 AttachAboveObjects(logicObject.GetComponent<Stackable>());
 
                 //Instantiate and imaginary god-object
@@ -109,7 +105,7 @@ public class Grab : MonoBehaviour {
         {
 
             var getLogicObjectCollision = logicObject.GetComponent<NotifyCollision>();
-
+            //Stack to the other hand
             //If the objects is colliding when it is released AND it is not colliding with the podium AND the stack that the object is being attached is not colliding with the podium 
             if (getLogicObjectCollision != null && getLogicObjectCollision.isColliding && !getLogicObjectCollision.collidedObj.gameObject.name.Equals("Podium") && !FindPodium(getLogicObjectCollision.collidedObj.gameObject.GetComponent<Stackable>())) {
                 AttachObjectToStack(logicObject, getLogicObjectCollision.collidedObj.gameObject);
@@ -139,20 +135,20 @@ public class Grab : MonoBehaviour {
         
     }
 
+    //-------------------------------------------------
+    // Search for objects stacked on the other hand and detach
+    //-------------------------------------------------
     void DetachFromOtherHand(GameObject thisHandObj, GameObject otherHandObj) {
 
         var joints = otherHandObj.GetComponents<FixedJoint>();
         if (joints == null) return;
         foreach (var joint in joints) {
-            if (joint != null) {
-                var aboveObjInOtherHand = joint.connectedBody.gameObject;
-                if (thisHandObj.name.Equals(aboveObjInOtherHand.name)) {
-                    Destroy(joint);
-                    break;
-                } else
-                    DetachFromOtherHand(thisHandObj, aboveObjInOtherHand);
-
-            }
+            var aboveObjInOtherHand = joint.connectedBody.gameObject;
+            if (thisHandObj.name.Equals(aboveObjInOtherHand.name)) {
+                Destroy(joint);
+                break;
+            } else
+                DetachFromOtherHand(thisHandObj, aboveObjInOtherHand);
         }
     }
 
@@ -164,14 +160,12 @@ public class Grab : MonoBehaviour {
         var joints = obj.GetComponents<FixedJoint>();
         if (joints == null) return;
         foreach (var joint in joints) {
-            if (joint != null) {
-                var connectedObj = joint.connectedBody.gameObject;
-                DetachAboveObjects(connectedObj);
-                connectedObj.GetComponent<Rigidbody>().useGravity = true;
-                Destroy(joint);
-                var objVisual = connectedObj.GetComponent<Stackable>().VisualRepresentation;
-                objVisual.gameObject.GetComponent<Renderer>().material.SetColor("_Color", objVisual.GetComponent<Grab>().materialOriginalColor);
-            }
+            var connectedObj = joint.connectedBody.gameObject;
+            DetachAboveObjects(connectedObj);
+            connectedObj.GetComponent<Rigidbody>().useGravity = true;
+            Destroy(joint);
+            var objVisual = connectedObj.GetComponent<Stackable>().VisualRepresentation;
+            objVisual.gameObject.GetComponent<Renderer>().material.SetColor("_Color", objVisual.GetComponent<Grab>().materialOriginalColor);
         }
     }
 
@@ -179,13 +173,14 @@ public class Grab : MonoBehaviour {
     // Search for objects stacked above the grabbed object, attach them with the grabbed object and change their material color.
     //-------------------------------------------------
     public void AttachAboveObjects(Stackable baseObj) {
-
+        
         var logics = GameObject.FindObjectsOfType<Stackable>();
         foreach (var obj in logics) {
             if (obj.baseStackable != null) // if the obj has an obj below
                 if (obj != baseObj) //if the obj is not the grabbed obj
                     if (obj.baseStackable.name.Equals(baseObj.name)) {
                         AttachAboveObjects(obj);
+                        if (baseObj.gameObject.GetComponent<FixedJoint>() != null) return;
                         var joint = baseObj.gameObject.AddComponent<FixedJoint>();
                         joint.connectedBody = obj.GetComponent<Rigidbody>();
                         obj.VisualRepresentation.gameObject.GetComponent<Renderer>().material.SetColor("_Color", Color.green);
@@ -194,6 +189,9 @@ public class Grab : MonoBehaviour {
         }
     }
 
+    //-------------------------------------------------
+    // Search for the object with the name "podium"
+    //-------------------------------------------------
     bool FindPodium(Stackable obj) {
         bool found = false;
         if (obj != null && obj.baseStackable != null) {
