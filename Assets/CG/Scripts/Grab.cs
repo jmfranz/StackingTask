@@ -19,6 +19,8 @@ public class Grab : MonoBehaviour {
     private Color materialOriginalColor;
     private Color hoverColor, selectColor;
 
+    public int qntObjsAbove = 0;
+
     //-------------------------------------------------
     void Awake() {
     }
@@ -68,8 +70,8 @@ public class Grab : MonoBehaviour {
                     var otherHandObj = hand.otherHand.gameObject.GetComponentInChildren<SimpleSpring>().logic;
                     DetachFromOtherHand(logicObject, otherHandObj);
                 }
-                   
-                AttachAboveObjects(logicObject.GetComponent<Stackable>());
+                qntObjsAbove = 0;  
+                AttachAboveObjects(logicObject.GetComponent<Stackable>(), ref qntObjsAbove);
 
                 //Instantiate and imaginary god-object
                 imaginary = Instantiate(imaginaryPrefab);
@@ -173,19 +175,19 @@ public class Grab : MonoBehaviour {
     //-------------------------------------------------
     // Search for objects stacked above the grabbed object, attach them with the grabbed object and change their material color.
     //-------------------------------------------------
-    public void AttachAboveObjects(Stackable baseObj) {
-        
+    public void AttachAboveObjects(Stackable baseObj, ref int qntObjsAbove) {
         var logics = GameObject.FindObjectsOfType<Stackable>();
         foreach (var obj in logics) {
             if (obj.baseStackable != null) // if the obj has an obj below
                 if (obj != baseObj) //if the obj is not the grabbed obj
                     if (obj.baseStackable.name.Equals(baseObj.name)) {
-                        AttachAboveObjects(obj);
+                        AttachAboveObjects(obj, ref qntObjsAbove);
                         if (baseObj.gameObject.GetComponent<FixedJoint>() != null) return;
                         var joint = baseObj.gameObject.AddComponent<FixedJoint>();
                         joint.connectedBody = obj.GetComponent<Rigidbody>();
                         obj.VisualRepresentation.gameObject.GetComponent<Renderer>().material.SetColor("_Color", selectColor);
                         obj.GetComponent<Rigidbody>().useGravity = false;
+                        qntObjsAbove++;
                     }
         }
     }
