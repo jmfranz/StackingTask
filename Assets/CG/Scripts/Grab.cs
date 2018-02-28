@@ -20,6 +20,9 @@ public class Grab : MonoBehaviour {
     private Color hoverColor, selectColor;
 
     public int qntObjsAbove = 0;
+    List<List<Stackable>> allStacks = new List<List<Stackable>>();
+
+    private GameObject center;
 
     //-------------------------------------------------
     void Awake() {
@@ -30,6 +33,7 @@ public class Grab : MonoBehaviour {
         materialOriginalColor = GetComponent<Renderer>().material.color;
         hoverColor = new Color(0.7f, 1.0f, 0.7f, 1.0f);
         selectColor = new Color(0.1f, 1.0f, 0.1f, 1.0f);
+        logicObject = GameObject.Find(this.transform.name + " Logic");
     }
 
 
@@ -38,6 +42,111 @@ public class Grab : MonoBehaviour {
     //-------------------------------------------------
     private void OnHandHoverBegin(Hand hand) {
         this.GetComponent<MeshRenderer>().material.SetColor("_Color", hoverColor);
+        DrawCenter();
+
+        ////       
+
+        ////
+        allStacks.Clear();
+        var allObjects = GameObject.FindObjectsOfType<Stackable>();
+        foreach (var obj in allObjects)
+        {
+            if (!obj.baseStackable.name.Equals("Podium")) continue;
+
+            //var objCollision = logicObject.GetComponent<NotifyCollision>().collidedObj.contacts;
+            
+
+            List<Stackable> stack = new List<Stackable>();
+            stack.Add(obj);
+            FindAboveObjects(obj, ref stack);
+            allStacks.Add(stack);
+        }
+
+        foreach(var list in allStacks){
+            ProjectStackable(list[list.Count-1], list.Count);
+        }
+        Debug.Log(allStacks[0].Count + " " + allStacks[1].Count);
+        ////
+    }
+
+    public void ProjectStackable(Stackable obj, int sizeList)
+    {
+        var objBox = obj.VisualRepresentation.gameObject.GetComponent<Renderer>();
+        if (objBox == null) return;
+
+        var pointMinCube = objBox.bounds.min;
+        var pointMaxCube = objBox.bounds.max;
+
+        var point4 = new Vector3(pointMinCube.x, pointMaxCube.y, pointMinCube.z);
+        var point6 = new Vector3(pointMinCube.x, pointMaxCube.y, pointMaxCube.z);
+        var point8 = new Vector3(pointMaxCube.x, pointMaxCube.y, pointMinCube.z);
+
+
+
+        //DrawPoint(pointMaxCube);
+        //DrawPoint(point6);
+        //DrawPoint(point4);
+        //DrawPoint(point8);
+
+        float step = 0.01f;
+
+
+        for (float x = point6.x; x < pointMaxCube.x; x += step)
+        {
+            for (float z = point6.z; z > point4.z; z -= step)
+            {
+                var p = new Vector3(x, pointMaxCube.y, z);
+                
+
+                RaycastHit[] hits;
+                var down = obj.gameObject.transform.up;
+                down.y = -down.y;
+
+                hits = Physics.RaycastAll(p, down, 100.0F);
+                //Debug.Log("leght " +hits.Length + hits[0].collider.gameObject + hits[1].collider.gameObject);
+                //Debug.Log(hits[1].collider.gameObject);
+                //Debug.DrawRay(p,down);
+
+                Debug.Log(hits.Length + " " + sizeList);
+                if (hits.Length == sizeList)
+                    DrawPoint(p);
+                /*
+                foreach ( var a in hits )
+                {
+                    Debug.Log(a.collider.gameObject);
+                }*/
+            }
+        }
+        /*
+        float m = (pointMaxCube.z - point6.z) / (pointMaxCube.x - point6.x);
+        for (float x = point6.x; x < pointMaxCube.x; x += step) {
+            float z = m * (x - point6.x) + point6.z;
+             DrawPoint(new Vector3(x, pointMaxCube.y, z));
+        }
+
+
+        float m2 = (point4.x - point6.x) / (point4.z - point6.z);
+        Debug.Log(point6.z + " " + point4.z);
+        for (float z = point6.z; z > point4.z; z -= step)
+        {
+            
+            float x = m2 * (z - point6.z) + point6.x;
+            DrawPoint(new Vector3(x, pointMaxCube.y, z));
+
+        }*/
+
+
+    }
+
+    public void DrawPoint(Vector3 point)
+    {
+        var sphere1cube = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+
+        sphere1cube.transform.position = point;
+
+        var scale = new Vector3(0.02f, 0.02f, 0.02f);
+
+        sphere1cube.transform.localScale = scale;
     }
 
 
@@ -45,9 +154,18 @@ public class Grab : MonoBehaviour {
     // Called when a Hand stops hovering over this object
     //-------------------------------------------------
     private void OnHandHoverEnd(Hand hand) {
-        this.GetComponent<Renderer>().material.SetColor("_Color", materialOriginalColor);
+        this.GetComponent<Renderer>().material.SetColor("_Color", materialOriginalColor);        
+        Destroy(center);
+    }    
+    public void DrawCenter()
+    {
+        center = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+        center.transform.position = transform.position;
+        center.transform.rotation = transform.rotation;
+        center.transform.localScale = new Vector3(0.005f, transform.localScale.y + 0.04f, 0.005f);
+        center.GetComponent<Collider>().enabled = false;
+        center.GetComponent<Renderer>().material.SetColor("_Color", Color.green);
     }
-
 
     //-------------------------------------------------
     // Called every Update() while a Hand is hovering over this object
@@ -57,10 +175,12 @@ public class Grab : MonoBehaviour {
         if (hand.GetStandardInteractionButtonDown()) {// || ((hand.controller != null) && hand.controller.GetPressDown(Valve.VR.EVRButtonId.k_EButton_Grip))) {
             if (hand.currentAttachedObject != gameObject) {
 
-                hand.controller.TriggerHapticPulse();
+                //hand.controller.TriggerHapticPulse();
                 this.GetComponent<Renderer>().material.SetColor("_Color", selectColor);
                 //Find the equivalent logic obj
                 logicObject = GameObject.Find(this.transform.name + " Logic");
+
+
 
                 // Check if the other hand has objects attached. 
                 // If so, we need to find out if the other hand is grabbing the object grabbed with this hand.
@@ -86,7 +206,7 @@ public class Grab : MonoBehaviour {
                 logicRb.useGravity = false;
 
                 //Add a script that inform us if the object is colliding
-                logicObject.AddComponent<NotifyCollision>();
+                //logicObject.AddComponent<NotifyCollision>();
 
                 var simpleSpring = imaginary.GetComponent<SimpleSpring>();
                 //Attaches a simple spring joint from the god-objce to the logic representation
@@ -119,7 +239,7 @@ public class Grab : MonoBehaviour {
             }
 
             Destroy(imaginary);
-            Destroy(logicObject.GetComponent<NotifyCollision>());
+            //Destroy(logicObject.GetComponent<NotifyCollision>());
             this.GetComponent<Renderer>().material.SetColor("_Color", hoverColor);
 
             // Detach this object from the hand
@@ -208,6 +328,24 @@ public class Grab : MonoBehaviour {
         else
             return false;
 
+    }
+
+    //-------------------------------------------------
+    // 
+    //-------------------------------------------------
+    public void FindAboveObjects(Stackable baseObj, ref List<Stackable> objsAbove)
+    {
+        var logics = GameObject.FindObjectsOfType<Stackable>();
+        foreach (var obj in logics)
+        {
+            if (obj.baseStackable != null) // if the obj has an obj below
+                if (obj != baseObj) //if the obj is not the grabbed obj
+                    if (obj.baseStackable.name.Equals(baseObj.name))
+                    {
+                        objsAbove.Add(obj);
+                        FindAboveObjects(obj, ref objsAbove);
+                    }
+        }
     }
 
 }
