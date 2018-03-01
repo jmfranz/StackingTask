@@ -53,9 +53,6 @@ public class Grab : MonoBehaviour {
         {
             if (!obj.baseStackable.name.Equals("Podium")) continue;
 
-            //var objCollision = logicObject.GetComponent<NotifyCollision>().collidedObj.contacts;
-            
-
             List<Stackable> stack = new List<Stackable>();
             stack.Add(obj);
             FindAboveObjects(obj, ref stack);
@@ -65,7 +62,6 @@ public class Grab : MonoBehaviour {
         foreach(var list in allStacks){
             ProjectStackable(list[list.Count-1], list.Count);
         }
-        Debug.Log(allStacks[0].Count + " " + allStacks[1].Count);
         ////
     }
 
@@ -80,43 +76,41 @@ public class Grab : MonoBehaviour {
         var point4 = new Vector3(pointMinCube.x, pointMaxCube.y, pointMinCube.z);
         var point6 = new Vector3(pointMinCube.x, pointMaxCube.y, pointMaxCube.z);
         var point8 = new Vector3(pointMaxCube.x, pointMaxCube.y, pointMinCube.z);
-
-
-
-        //DrawPoint(pointMaxCube);
-        //DrawPoint(point6);
-        //DrawPoint(point4);
-        //DrawPoint(point8);
+        
 
         float step = 0.01f;
 
 
+        var theVertices = new List<Vector3>();
         for (float x = point6.x; x < pointMaxCube.x; x += step)
         {
             for (float z = point6.z; z > point4.z; z -= step)
             {
-                var p = new Vector3(x, pointMaxCube.y, z);
-                
+                var p = new Vector3(x, pointMaxCube.y, z);               
 
                 RaycastHit[] hits;
                 var down = obj.gameObject.transform.up;
                 down.y = -down.y;
 
                 hits = Physics.RaycastAll(p, down, 100.0F);
-                //Debug.Log("leght " +hits.Length + hits[0].collider.gameObject + hits[1].collider.gameObject);
-                //Debug.Log(hits[1].collider.gameObject);
-                //Debug.DrawRay(p,down);
 
-                Debug.Log(hits.Length + " " + sizeList);
                 if (hits.Length == sizeList)
                     DrawPoint(p);
-                /*
-                foreach ( var a in hits )
-                {
-                    Debug.Log(a.collider.gameObject);
-                }*/
+                    //theVertices.Add(p);
             }
         }
+        /*
+        GameObject threeDSquare = new GameObject("3DSquare");
+        threeDSquare.AddComponent<MeshRenderer>();
+        threeDSquare.AddComponent<MeshFilter>();
+
+        Mesh mesh = new Mesh();
+        mesh.vertices = theVertices.ToArray();
+        //mesh.uv = uvs.ToArray();
+        //mesh.triangles = tris.ToArray();
+        //mesh.RecalculateNormals();
+        threeDSquare.GetComponent<MeshFilter>().mesh = mesh;*/
+        
         /*
         float m = (pointMaxCube.z - point6.z) / (pointMaxCube.x - point6.x);
         for (float x = point6.x; x < pointMaxCube.x; x += step) {
@@ -140,13 +134,11 @@ public class Grab : MonoBehaviour {
 
     public void DrawPoint(Vector3 point)
     {
-        var sphere1cube = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-
+        var sphere1cube = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
         sphere1cube.transform.position = point;
-
-        var scale = new Vector3(0.02f, 0.02f, 0.02f);
-
+        var scale = new Vector3(0.002f, 0.0002f, 0.002f);
         sphere1cube.transform.localScale = scale;
+        sphere1cube.GetComponent<MeshRenderer>().material.SetColor("_Color", hoverColor);
     }
 
 
