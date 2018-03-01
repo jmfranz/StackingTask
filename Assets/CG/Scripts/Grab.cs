@@ -21,6 +21,8 @@ public class Grab : MonoBehaviour {
 
     public int qntObjsAbove = 0;
     List<List<Stackable>> allStacks = new List<List<Stackable>>();
+    public List<Vector3> pointsSuggestion = new List<Vector3>();
+
 
     private GameObject center;
 
@@ -34,6 +36,11 @@ public class Grab : MonoBehaviour {
         hoverColor = new Color(0.7f, 1.0f, 0.7f, 1.0f);
         selectColor = new Color(0.1f, 1.0f, 0.1f, 1.0f);
         logicObject = GameObject.Find(this.transform.name + " Logic");
+
+        Vector3[] points = new Vector3[4] ;
+        GetObjectBounds(logicObject.GetComponent<Stackable>(), ref points);
+        CreateUpperBoundArea(points);
+
     }
 
 
@@ -46,27 +53,11 @@ public class Grab : MonoBehaviour {
 
         ////       
 
-        ////
-        allStacks.Clear();
-        var allObjects = GameObject.FindObjectsOfType<Stackable>();
-        foreach (var obj in allObjects)
-        {
-            if (!obj.baseStackable.name.Equals("Podium")) continue;
 
-            List<Stackable> stack = new List<Stackable>();
-            stack.Add(obj);
-            FindAboveObjects(obj, ref stack);
-            allStacks.Add(stack);
-        }
-
-        foreach(var list in allStacks){
-            ProjectStackable(list[list.Count-1], list.Count);
-        }
-        ////
     }
 
-    public void ProjectStackable(Stackable obj, int sizeList)
-    {
+    public void GetObjectBounds(Stackable obj, ref Vector3[] points) {
+
         var objBox = obj.VisualRepresentation.gameObject.GetComponent<Renderer>();
         if (objBox == null) return;
 
@@ -76,65 +67,82 @@ public class Grab : MonoBehaviour {
         var point4 = new Vector3(pointMinCube.x, pointMaxCube.y, pointMinCube.z);
         var point6 = new Vector3(pointMinCube.x, pointMaxCube.y, pointMaxCube.z);
         var point8 = new Vector3(pointMaxCube.x, pointMaxCube.y, pointMinCube.z);
-        
+
+        points[0] = point6;
+        points[1] = pointMaxCube;
+        points[2] = point4;
+        points[3] = point8;
+
+    }
+
+    public void CreateUpperBoundArea(Vector3[] boundPoints) {
 
         float step = 0.01f;
 
+        for (float x = boundPoints[0].x; x < boundPoints[1].x; x += step) {
+            for (float z = boundPoints[0].z; z > boundPoints[2].z; z -= step) {
+                var p = new Vector3(x, boundPoints[1].y, z);
 
-        var theVertices = new List<Vector3>();
-        for (float x = point6.x; x < pointMaxCube.x; x += step)
-        {
-            for (float z = point6.z; z > point4.z; z -= step)
-            {
-                var p = new Vector3(x, pointMaxCube.y, z);               
+                pointsSuggestion.Add(p);
 
-                RaycastHit[] hits;
-                var down = obj.gameObject.transform.up;
-                down.y = -down.y;
 
-                hits = Physics.RaycastAll(p, down, 100.0F);
-
-                if (hits.Length == sizeList)
-                    DrawPoint(p);
-                    //theVertices.Add(p);
             }
         }
-        /*
-        GameObject threeDSquare = new GameObject("3DSquare");
-        threeDSquare.AddComponent<MeshRenderer>();
-        threeDSquare.AddComponent<MeshFilter>();
+    }
 
-        Mesh mesh = new Mesh();
-        mesh.vertices = theVertices.ToArray();
-        //mesh.uv = uvs.ToArray();
-        //mesh.triangles = tris.ToArray();
-        //mesh.RecalculateNormals();
-        threeDSquare.GetComponent<MeshFilter>().mesh = mesh;*/
-        
-        /*
-        float m = (pointMaxCube.z - point6.z) / (pointMaxCube.x - point6.x);
-        for (float x = point6.x; x < pointMaxCube.x; x += step) {
-            float z = m * (x - point6.x) + point6.z;
-             DrawPoint(new Vector3(x, pointMaxCube.y, z));
+    public void ProjectStackable(Stackable obj, int listSize) {
+
+        var pS = obj.VisualRepresentation.GetComponent<Grab>().pointsSuggestion;
+
+        foreach (var point in pS) {
+            RaycastHit[] hits;
+            var down = obj.gameObject.transform.up;
+            down.y = -down.y;
+
+            hits = Physics.RaycastAll(point, down, 100.0F);
+
+            if (hits.Length == listSize)
+                DrawPoint(point);
         }
 
-
-        float m2 = (point4.x - point6.x) / (point4.z - point6.z);
-        Debug.Log(point6.z + " " + point4.z);
-        for (float z = point6.z; z > point4.z; z -= step)
-        {
-            
-            float x = m2 * (z - point6.z) + point6.x;
-            DrawPoint(new Vector3(x, pointMaxCube.y, z));
-
-        }*/
-
-
     }
+    /*
+    GameObject threeDSquare = new GameObject("3DSquare");
+    threeDSquare.AddComponent<MeshRenderer>();
+    threeDSquare.AddComponent<MeshFilter>();
+
+    Mesh mesh = new Mesh();
+    mesh.vertices = theVertices.ToArray();
+    //mesh.uv = uvs.ToArray();
+    //mesh.triangles = tris.ToArray();
+    //mesh.RecalculateNormals();
+    threeDSquare.GetComponent<MeshFilter>().mesh = mesh;*/
+
+    /*
+    float m = (pointMaxCube.z - point6.z) / (pointMaxCube.x - point6.x);
+    for (float x = point6.x; x < pointMaxCube.x; x += step) {
+        float z = m * (x - point6.x) + point6.z;
+         DrawPoint(new Vector3(x, pointMaxCube.y, z));
+    }
+
+
+    float m2 = (point4.x - point6.x) / (point4.z - point6.z);
+    Debug.Log(point6.z + " " + point4.z);
+    for (float z = point6.z; z > point4.z; z -= step)
+    {
+
+        float x = m2 * (z - point6.z) + point6.x;
+        DrawPoint(new Vector3(x, pointMaxCube.y, z));
+
+    }*/
+
+
+
 
     public void DrawPoint(Vector3 point)
     {
         var sphere1cube = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+        sphere1cube.GetComponent<Collider>().enabled = false;
         sphere1cube.transform.position = point;
         var scale = new Vector3(0.002f, 0.0002f, 0.002f);
         sphere1cube.transform.localScale = scale;
@@ -167,6 +175,25 @@ public class Grab : MonoBehaviour {
         if (hand.GetStandardInteractionButtonDown()) {// || ((hand.controller != null) && hand.controller.GetPressDown(Valve.VR.EVRButtonId.k_EButton_Grip))) {
             if (hand.currentAttachedObject != gameObject) {
 
+
+                ////
+                allStacks.Clear();
+                var allObjects = GameObject.FindObjectsOfType<Stackable>();
+                foreach (var obj in allObjects) {
+                    //if (!obj.baseStackable.name.Equals("Podium")) continue;
+
+                    List<Stackable> stack = new List<Stackable>();
+                    stack.Add(obj);
+                    FindAboveObjects(obj, ref stack);
+                    allStacks.Add(stack);
+                }
+
+                foreach (var list in allStacks) {
+                    ProjectStackable(list[list.Count - 1], list.Count);
+                }
+                ////
+
+
                 //hand.controller.TriggerHapticPulse();
                 this.GetComponent<Renderer>().material.SetColor("_Color", selectColor);
                 //Find the equivalent logic obj
@@ -198,7 +225,7 @@ public class Grab : MonoBehaviour {
                 logicRb.useGravity = false;
 
                 //Add a script that inform us if the object is colliding
-                //logicObject.AddComponent<NotifyCollision>();
+                logicObject.AddComponent<NotifyCollision>();
 
                 var simpleSpring = imaginary.GetComponent<SimpleSpring>();
                 //Attaches a simple spring joint from the god-objce to the logic representation
@@ -231,7 +258,7 @@ public class Grab : MonoBehaviour {
             }
 
             Destroy(imaginary);
-            //Destroy(logicObject.GetComponent<NotifyCollision>());
+            Destroy(logicObject.GetComponent<NotifyCollision>());
             this.GetComponent<Renderer>().material.SetColor("_Color", hoverColor);
 
             // Detach this object from the hand
@@ -330,7 +357,7 @@ public class Grab : MonoBehaviour {
         var logics = GameObject.FindObjectsOfType<Stackable>();
         foreach (var obj in logics)
         {
-            if (obj.baseStackable != null) // if the obj has an obj below
+            if (obj.baseStackable != null || imaginary != null) // if the obj has an obj below
                 if (obj != baseObj) //if the obj is not the grabbed obj
                     if (obj.baseStackable.name.Equals(baseObj.name))
                     {
@@ -340,5 +367,12 @@ public class Grab : MonoBehaviour {
         }
     }
 
+    private void Update() {
+        Matrix4x4 objMat = Matrix4x4.TRS(gameObject.transform.position, gameObject.transform.rotation, gameObject.transform.localScale);
+
+        for (int i = 0; i < pointsSuggestion.Count; i++) {
+            pointsSuggestion[i] = objMat * pointsSuggestion[i];
+        }
+    }
 }
 
