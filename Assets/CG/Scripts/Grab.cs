@@ -41,6 +41,8 @@ public class Grab : MonoBehaviour {
         GetObjectBounds(logicObject.GetComponent<Stackable>(), ref points);
         CreateUpperBoundArea(points);
 
+        
+
     }
 
 
@@ -55,7 +57,7 @@ public class Grab : MonoBehaviour {
         allStacks.Clear();
         var allObjects = GameObject.FindObjectsOfType<Stackable>();
         foreach (var obj in allObjects) {
-            //if (!obj.baseStackable.name.Equals("Podium")) continue;
+            if (!obj.baseStackable.name.Equals("Podium")) continue;
 
             List<Stackable> stack = new List<Stackable>();
             stack.Add(obj);
@@ -72,6 +74,8 @@ public class Grab : MonoBehaviour {
     }
 
     public void GetObjectBounds(Stackable obj, ref Vector3[] points) {
+
+
 
         var objBox = obj.VisualRepresentation.gameObject.GetComponent<Renderer>();
         if (objBox == null) return;
@@ -92,11 +96,16 @@ public class Grab : MonoBehaviour {
 
     public void CreateUpperBoundArea(Vector3[] boundPoints) {
 
+        boundPoints[0] = boundPoints[0] - gameObject.transform.position;
+        boundPoints[1] = boundPoints[1] - gameObject.transform.position;
+        boundPoints[2] = boundPoints[2] - gameObject.transform.position;
+        boundPoints[3] = boundPoints[3] - gameObject.transform.position;
+
         float step = 0.01f;
 
         for (float x = boundPoints[0].x; x < boundPoints[1].x; x += step) {
             for (float z = boundPoints[0].z; z > boundPoints[2].z; z -= step) {
-                var p = new Vector3(x, boundPoints[1].y, z);
+                var p = new Vector3(x, boundPoints[1].y+0.001f, z);
 
                 pointsSuggestion.Add(p);
 
@@ -107,17 +116,23 @@ public class Grab : MonoBehaviour {
 
     public void ProjectStackable(Stackable obj, int listSize) {
 
-        var pS = obj.VisualRepresentation.GetComponent<Grab>().pointsSuggestion;
+        var pS = obj.VisualRepresentation.GetComponent<Grab>().pointsSuggestion;        
+
+        Matrix4x4 objMat = Matrix4x4.TRS(obj.gameObject.transform.position, obj.gameObject.transform.rotation, Vector3.one);
 
         foreach (var point in pS) {
             RaycastHit[] hits;
             var down = obj.gameObject.transform.up;
             down.y = -down.y;
 
-            hits = Physics.RaycastAll(point, down, 100.0F);
+            Vector3 pointF = objMat.MultiplyPoint3x4(point);
 
-            if (hits.Length == listSize)
-                DrawPoint(point);
+            hits = Physics.RaycastAll(pointF, down, 100.0F);
+
+            //Debug.Log( hits.Length + " " + listSize);
+
+            //if (hits.Length == listSize)
+                DrawPoint(pointF);
         }
 
     }
@@ -366,20 +381,22 @@ public class Grab : MonoBehaviour {
                     }
         }
     }
-
+    /*
     float count = 0;
     private void Update() {
         Matrix4x4 objMat = Matrix4x4.TRS(gameObject.transform.position, gameObject.transform.rotation, Vector3.one);
-        //Matrix4x4 inv = objMat.inverse;
-        if (count % 100 == 0) {
+        Matrix4x4 inv = objMat.inverse;
+        if (count % 50 == 0) {
             for (int i = 0; i < pointsSuggestion.Count; i++) {
                 //pointsSuggestion[i] = inv.MultiplyPoint3x4(pointsSuggestion[i]);
-                pointsSuggestion[i] = objMat.MultiplyPoint3x4(pointsSuggestion[i]);
-                
-                DrawPoint(pointsSuggestion[i]);
+
+                //pointsSuggestion[i]-= gameObject.transform.position;
+                //pointsSuggestion[i] = objMat * pointsSuggestion[i];
+
+                DrawPoint(objMat.MultiplyPoint3x4(pointsSuggestion[i]));
             }
         }
         count++;
-    }
+    }*/
 }
 
