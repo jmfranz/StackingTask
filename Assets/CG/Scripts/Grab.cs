@@ -51,7 +51,22 @@ public class Grab : MonoBehaviour {
         this.GetComponent<MeshRenderer>().material.SetColor("_Color", hoverColor);
         DrawCenter();
 
-        ////       
+        ////
+        allStacks.Clear();
+        var allObjects = GameObject.FindObjectsOfType<Stackable>();
+        foreach (var obj in allObjects) {
+            //if (!obj.baseStackable.name.Equals("Podium")) continue;
+
+            List<Stackable> stack = new List<Stackable>();
+            stack.Add(obj);
+            FindAboveObjects(obj, ref stack);
+            allStacks.Add(stack);
+        }
+
+        foreach (var list in allStacks) {
+            ProjectStackable(list[list.Count - 1], list.Count);
+        }
+        ////    
 
 
     }
@@ -176,22 +191,7 @@ public class Grab : MonoBehaviour {
             if (hand.currentAttachedObject != gameObject) {
 
 
-                ////
-                allStacks.Clear();
-                var allObjects = GameObject.FindObjectsOfType<Stackable>();
-                foreach (var obj in allObjects) {
-                    //if (!obj.baseStackable.name.Equals("Podium")) continue;
 
-                    List<Stackable> stack = new List<Stackable>();
-                    stack.Add(obj);
-                    FindAboveObjects(obj, ref stack);
-                    allStacks.Add(stack);
-                }
-
-                foreach (var list in allStacks) {
-                    ProjectStackable(list[list.Count - 1], list.Count);
-                }
-                ////
 
 
                 //hand.controller.TriggerHapticPulse();
@@ -367,12 +367,19 @@ public class Grab : MonoBehaviour {
         }
     }
 
+    float count = 0;
     private void Update() {
-        Matrix4x4 objMat = Matrix4x4.TRS(gameObject.transform.position, gameObject.transform.rotation, gameObject.transform.localScale);
-
-        for (int i = 0; i < pointsSuggestion.Count; i++) {
-            pointsSuggestion[i] = objMat * pointsSuggestion[i];
+        Matrix4x4 objMat = Matrix4x4.TRS(gameObject.transform.position, gameObject.transform.rotation, Vector3.one);
+        //Matrix4x4 inv = objMat.inverse;
+        if (count % 100 == 0) {
+            for (int i = 0; i < pointsSuggestion.Count; i++) {
+                //pointsSuggestion[i] = inv.MultiplyPoint3x4(pointsSuggestion[i]);
+                pointsSuggestion[i] = objMat.MultiplyPoint3x4(pointsSuggestion[i]);
+                
+                DrawPoint(pointsSuggestion[i]);
+            }
         }
+        count++;
     }
 }
 
