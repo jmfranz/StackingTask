@@ -20,7 +20,7 @@ public class SimpleSpring : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-        isColliding = logic.GetComponent<NotifyCollision>().isColliding;
+        //isColliding = logic.GetComponent<NotifyCollision>().isColliding;
         k = DEFAULT_K;
 	}
 
@@ -28,6 +28,7 @@ public class SimpleSpring : MonoBehaviour {
     void FixedUpdate () {
         if (pivot == null)
             return;
+        isColliding = logic.GetComponent<NotifyCollision>().isColliding;
         Vector3 dir = logic.transform.position - pivot.transform.position;
 
         //Nao desliza :)

@@ -184,36 +184,57 @@ public class Grab : MonoBehaviour {
     //-------------------------------------------------
     private void HandHoverUpdate(Hand hand) {
 
-        
-
         if (hand.GetStandardInteractionButtonDown()) {// || ((hand.controller != null) && hand.controller.GetPressDown(Valve.VR.EVRButtonId.k_EButton_Grip))) {
             if (hand.currentAttachedObject != gameObject) {
 
+                //Instantiate and imaginary god-object
+                imaginary = Instantiate(imaginaryPrefab);
+
+                //Sets the god-object position to the same as the visual representation
+                imaginary.transform.position = this.transform.position;
+                imaginary.transform.rotation = this.transform.rotation;
+                imaginary.transform.parent = hand.transform;
+
+                //Disable the logic object gravity so we can move it around freely
+                var logicRb = logicObject.GetComponent<Rigidbody>();
+                logicRb.useGravity = false;
+
+                //Add a script that inform us if the object is colliding
+                logicObject.AddComponent<NotifyCollision>();
+
+                var simpleSpring = imaginary.GetComponent<SimpleSpring>();
+                //Attaches a simple spring joint from the god-objce to the logic representation
+                simpleSpring.logic = logicObject;
+                simpleSpring.pivot = imaginary;
+                simpleSpring.offset = logicObject.transform.rotation;
+
+
+
                 ////
                 allStacks.Clear();
-                var allObjects = GameObject.FindObjectsOfType<Stackable>();
-                foreach (var obj in allObjects) {
-                    obj.VisualRepresentation.GetComponent<Grab>().drawnPoints = new GameObject();
-                    obj.VisualRepresentation.GetComponent<Grab>().drawnPoints.transform.parent = obj.VisualRepresentation.gameObject.transform;
-                    if (obj.baseStackable == null || !obj.baseStackable.name.Equals("Podium")) continue;
-                    List<Stackable> stack = new List<Stackable>();
-                    stack.Add(obj);
-                    FindAboveObjects(obj, ref stack);
-                    allStacks.Add(stack);
-                }
                 if(hand.otherHand.gameObject.GetComponentInChildren<SimpleSpring>() != null) {
                     List<Stackable> stack = new List<Stackable>();
                     var logicStackable = logicObject.GetComponent<Stackable>();
-                    stack.Add(logicStackable);
-                    FindAboveObjects(logicStackable, ref stack);
-                    allStacks.Add(stack);
-
-                    stack.Clear();
                     logicStackable = hand.otherHand.gameObject.GetComponentInChildren<SimpleSpring>().logic.GetComponent<Stackable>();
+                    logicStackable.VisualRepresentation.GetComponent<Grab>().drawnPoints = new GameObject();
+                    logicStackable.VisualRepresentation.GetComponent<Grab>().drawnPoints.transform.parent = logicStackable.VisualRepresentation.gameObject.transform;
                     stack.Add(logicStackable);
                     FindAboveObjects(logicStackable, ref stack);
                     allStacks.Add(stack);
+                    
 
+                } else {
+                    var allObjects = GameObject.FindObjectsOfType<Stackable>();
+                    foreach (var obj in allObjects) {
+                        if (hand.gameObject.GetComponentInChildren<SimpleSpring>() != null && hand.gameObject.GetComponentInChildren<SimpleSpring>().logic.name.Equals(obj.name)) continue;
+                        obj.VisualRepresentation.GetComponent<Grab>().drawnPoints = new GameObject();
+                        obj.VisualRepresentation.GetComponent<Grab>().drawnPoints.transform.parent = obj.VisualRepresentation.gameObject.transform;
+                        if (obj.baseStackable == null || !obj.baseStackable.name.Equals("Podium")) continue;
+                        List<Stackable> stack = new List<Stackable>();
+                        stack.Add(obj);
+                        FindAboveObjects(obj, ref stack);
+                        allStacks.Add(stack);
+                    }
                 }
 
 
@@ -244,26 +265,7 @@ public class Grab : MonoBehaviour {
                 qntObjsAbove = 0;  
                 AttachAboveObjects(logicObject.GetComponent<Stackable>(), ref qntObjsAbove);
 
-                //Instantiate and imaginary god-object
-                imaginary = Instantiate(imaginaryPrefab);
 
-                //Sets the god-object position to the same as the visual representation
-                imaginary.transform.position = this.transform.position;
-                imaginary.transform.rotation = this.transform.rotation;
-                imaginary.transform.parent = hand.transform;
-
-                //Disable the logic object gravity so we can move it around freely
-                var logicRb = logicObject.GetComponent<Rigidbody>();
-                logicRb.useGravity = false;
-
-                //Add a script that inform us if the object is colliding
-                logicObject.AddComponent<NotifyCollision>();
-
-                var simpleSpring = imaginary.GetComponent<SimpleSpring>();
-                //Attaches a simple spring joint from the god-objce to the logic representation
-                simpleSpring.logic = logicObject;
-                simpleSpring.pivot = imaginary;
-                simpleSpring.offset = logicObject.transform.rotation;
 
                 // Call this to continue receiving HandHoverUpdate messages,
                 // and prevent the hand from hovering over anything else
@@ -292,9 +294,11 @@ public class Grab : MonoBehaviour {
             Destroy(imaginary);
             Destroy(logicObject.GetComponent<NotifyCollision>());
 
-            var allObjects = GameObject.FindObjectsOfType<Stackable>();
-            foreach (var obj in allObjects)
-                Destroy(obj.VisualRepresentation.GetComponent<Grab>().drawnPoints);
+            if (hand.otherHand.gameObject.GetComponentInChildren<SimpleSpring>() == null) {
+                var allObjects = GameObject.FindObjectsOfType<Stackable>();
+                foreach (var obj in allObjects)
+                    Destroy(obj.VisualRepresentation.GetComponent<Grab>().drawnPoints);
+            } 
 
             Destroy(center);
 
@@ -398,7 +402,7 @@ public class Grab : MonoBehaviour {
         var logics = GameObject.FindObjectsOfType<Stackable>();
         foreach (var obj in logics)
         {
-            if (obj.baseStackable != null || imaginary != null) // if the obj has an obj below
+            if (obj.baseStackable != null) // if the obj has an obj below
                 if (obj != baseObj) //if the obj is not the grabbed obj
                     if (obj.baseStackable.name.Equals(baseObj.name))
                     {
