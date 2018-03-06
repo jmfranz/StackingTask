@@ -20,6 +20,7 @@ public class Grab : MonoBehaviour {
     private Color hoverColor, selectColor;
 
     public int qntObjsAbove = 0;
+    
 
     //-------------------------------------------------
     void Awake() {
@@ -84,9 +85,10 @@ public class Grab : MonoBehaviour {
                 //Disable the logic object gravity so we can move it around freely
                 var logicRb = logicObject.GetComponent<Rigidbody>();
                 logicRb.useGravity = false;
-
+                logicRb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
                 //Add a script that inform us if the object is colliding
                 logicObject.AddComponent<NotifyCollision>();
+
 
                 var simpleSpring = imaginary.GetComponent<SimpleSpring>();
                 //Attaches a simple spring joint from the god-objce to the logic representation
@@ -100,8 +102,6 @@ public class Grab : MonoBehaviour {
 
                 // Attach this object to the hand
                 hand.AttachObject(imaginary, attachmentFlags);
-
-
             }
         }
         if (hand.GetStandardInteractionButtonUp())// || hand.controller.GetPressUp(Valve.VR.EVRButtonId.k_EButton_Grip) && hand.currentAttachedObject != null)
@@ -115,7 +115,9 @@ public class Grab : MonoBehaviour {
             } else {
                 //Resets original settings of the logic object
                 DetachAboveObjects(logicObject);
-                logicObject.GetComponent<Rigidbody>().useGravity = true;
+                var logicRb = logicObject.GetComponent<Rigidbody>();
+                logicRb.GetComponent<Rigidbody>().useGravity = true;
+                logicRb.GetComponent<Rigidbody>().collisionDetectionMode = CollisionDetectionMode.Discrete;
             }
 
             Destroy(imaginary);
@@ -126,7 +128,7 @@ public class Grab : MonoBehaviour {
             hand.DetachObject(imaginary);
             // Call this to undo HoverLock
             hand.HoverUnlock(GetComponent<Interactable>());
-
+            logicObject.transform.Translate(Vector3.zero);
         }
     }
 
@@ -165,7 +167,9 @@ public class Grab : MonoBehaviour {
         foreach (var joint in joints) {
             var connectedObj = joint.connectedBody.gameObject;
             DetachAboveObjects(connectedObj);
-            connectedObj.GetComponent<Rigidbody>().useGravity = true;
+            var objRb = connectedObj.GetComponent<Rigidbody>();
+            objRb.useGravity = true;
+            objRb.collisionDetectionMode = CollisionDetectionMode.Discrete;
             Destroy(joint);
             var objVisual = connectedObj.GetComponent<Stackable>().VisualRepresentation;
             objVisual.gameObject.GetComponent<Renderer>().material.SetColor("_Color", objVisual.GetComponent<Grab>().materialOriginalColor);
@@ -186,7 +190,9 @@ public class Grab : MonoBehaviour {
                         var joint = baseObj.gameObject.AddComponent<FixedJoint>();
                         joint.connectedBody = obj.GetComponent<Rigidbody>();
                         obj.VisualRepresentation.gameObject.GetComponent<Renderer>().material.SetColor("_Color", selectColor);
-                        obj.GetComponent<Rigidbody>().useGravity = false;
+                        var objRb = obj.GetComponent<Rigidbody>();
+                        objRb.useGravity = false;
+                        objRb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
                         qntObjsAbove++;
                     }
         }
