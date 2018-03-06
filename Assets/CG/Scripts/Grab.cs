@@ -31,6 +31,8 @@ public class Grab : MonoBehaviour {
         materialOriginalColor = GetComponent<Renderer>().material.color;
         hoverColor = new Color(0.7f, 1.0f, 0.7f, 1.0f);
         selectColor = new Color(0.1f, 1.0f, 0.1f, 1.0f);
+        //Find the equivalent logic obj
+        logicObject = GameObject.Find(this.transform.name + " Logic");
     }
 
 
@@ -38,6 +40,7 @@ public class Grab : MonoBehaviour {
     // Called when a Hand starts hovering over this object
     //-------------------------------------------------
     private void OnHandHoverBegin(Hand hand) {
+        if (logicObject.GetComponent<Stackable>().baseStackable == null) return;
         this.GetComponent<MeshRenderer>().material.SetColor("_Color", hoverColor);
     }
 
@@ -46,6 +49,8 @@ public class Grab : MonoBehaviour {
     // Called when a Hand stops hovering over this object
     //-------------------------------------------------
     private void OnHandHoverEnd(Hand hand) {
+        if(hand.otherHand.currentAttachedObject)
+        if (logicObject.GetComponent<Stackable>().baseStackable == null) return;
         this.GetComponent<Renderer>().material.SetColor("_Color", materialOriginalColor);
     }
 
@@ -60,8 +65,7 @@ public class Grab : MonoBehaviour {
 
                 hand.controller.TriggerHapticPulse();
                 this.GetComponent<Renderer>().material.SetColor("_Color", selectColor);
-                //Find the equivalent logic obj
-                logicObject = GameObject.Find(this.transform.name + " Logic");
+
 
                 // Check if the other hand has objects attached. 
                 // If so, we need to find out if the other hand is grabbing the object grabbed with this hand.
@@ -111,18 +115,21 @@ public class Grab : MonoBehaviour {
             //Stack to the other hand
             //If the objects is colliding when it is released AND it is not colliding with the podium AND the stack that the object is being attached is not colliding with the podium 
             if (getLogicObjectCollision != null && getLogicObjectCollision.isColliding && !getLogicObjectCollision.collidedObj.gameObject.name.Equals("Podium") && !FindPodium(getLogicObjectCollision.collidedObj.gameObject.GetComponent<Stackable>())) {
+                logicObject.GetComponent<Rigidbody>().collisionDetectionMode = CollisionDetectionMode.Discrete;
                 AttachObjectToStack(logicObject, getLogicObjectCollision.collidedObj.gameObject);
+                logicObject.GetComponent<Rigidbody>().collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
             } else {
                 //Resets original settings of the logic object
                 DetachAboveObjects(logicObject);
                 var logicRb = logicObject.GetComponent<Rigidbody>();
                 logicRb.GetComponent<Rigidbody>().useGravity = true;
                 logicRb.GetComponent<Rigidbody>().collisionDetectionMode = CollisionDetectionMode.Discrete;
+                this.GetComponent<Renderer>().material.SetColor("_Color", hoverColor);
             }
 
             Destroy(imaginary);
             Destroy(logicObject.GetComponent<NotifyCollision>());
-            this.GetComponent<Renderer>().material.SetColor("_Color", hoverColor);
+            
 
             // Detach this object from the hand
             hand.DetachObject(imaginary);
@@ -136,8 +143,9 @@ public class Grab : MonoBehaviour {
     void AttachObjectToStack(GameObject thisObj, GameObject baseObj) {
         var joint = baseObj.gameObject.AddComponent<FixedJoint>();
         joint.connectedBody = thisObj.GetComponent<Rigidbody>();
+        //thisObj.GetComponent<Stackable>().VisualRepresentation.gameObject.GetComponent<Renderer>().material.SetColor("_Color", selectColor);
         //thisObj.GetComponent<Rigidbody>().useGravity = false;
-        
+
     }
 
     //-------------------------------------------------
