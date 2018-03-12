@@ -36,23 +36,11 @@ public class Grab : MonoBehaviour {
         hoverColor = new Color(0.7f, 1.0f, 0.7f, 1.0f);
         selectColor = new Color(0.1f, 1.0f, 0.1f, 1.0f);
         logicObject = GameObject.Find(this.transform.name + " Logic");
-
-        Vector3[] points = new Vector3[4] ;
-        GetObjectBounds(logicObject.GetComponent<Stackable>(), ref points);
-        CreateUpperBoundArea(points);
+        
+        CreateUpperBoundArea();
 
 
     }
-
-
-    //-------------------------------------------------
-    // Called when a Hand starts hovering over this object
-    //-------------------------------------------------
-    private void OnHandHoverBegin(Hand hand) {
-        this.GetComponent<MeshRenderer>().material.SetColor("_Color", hoverColor);
-
-    }
-
     public void GetObjectBounds(Stackable obj, ref Vector3[] points) {
 
         var objBox = obj.VisualRepresentation.gameObject.GetComponent<Renderer>();
@@ -71,93 +59,133 @@ public class Grab : MonoBehaviour {
         points[3] = point8;
 
     }
+    //-------------------------------------------------
+    // Create upper area the object
+    //-------------------------------------------------
+    public void CreateUpperBoundArea() {
+        
+        var boundMid = gameObject.transform.localScale/2;
+        float step = 0.004f;
 
-    public void CreateUpperBoundArea(Vector3[] boundPoints) {
+        Matrix4x4 objMat = Matrix4x4.TRS(gameObject.transform.position, gameObject.transform.rotation, Vector3.one);
 
-        boundPoints[0] = boundPoints[0] - gameObject.transform.position;
-        boundPoints[1] = boundPoints[1] - gameObject.transform.position;
-        boundPoints[2] = boundPoints[2] - gameObject.transform.position;
-        boundPoints[3] = boundPoints[3] - gameObject.transform.position;
-
-        float step = 0.01f;
-
-        for (float x = boundPoints[0].x; x < boundPoints[1].x; x += step) {
-            for (float z = boundPoints[0].z; z > boundPoints[2].z; z -= step) {
-                var p = new Vector3(x, boundPoints[1].y+0.001f, z);
-
-                pointsSuggestion.Add(p);
-
-
+        for (float x = -boundMid.x + 0.002f; x <= boundMid.x; x += step) {
+            for (float z = -boundMid.z + 0.002f; z <= boundMid.z; z += step) {
+                var p = new Vector3(x, boundMid.z+0.001f, z);
+                var p2 = objMat.MultiplyPoint3x4(p);
+                
+                if (Physics.Raycast(p2, -gameObject.transform.up))
+                {
+                    pointsSuggestion.Add(p);
+                }
             }
         }
     }
+    //-------------------------------------------------
+    // Find upper direcction the object
+    //-------------------------------------------------
+    public Vector3 UpperDirecction(Stackable obj)
+    {
+        Vector3 upAbsolute = Vector3.up;
+        if (obj.baseStackable != null)
+        {
+            var vup = Vector3.Project(obj.gameObject.transform.up, Vector3.up);
+            var vri = Vector3.Project(obj.gameObject.transform.right, Vector3.up);
+            var vfo = Vector3.Project(obj.gameObject.transform.forward, Vector3.up);
 
+            Vector3 max;
+
+            if (vup.magnitude > vri.magnitude) { max = vup; upAbsolute = obj.gameObject.transform.up; } else { max = vri; upAbsolute = obj.gameObject.transform.right; }
+            if (max.magnitude < vfo.magnitude) { max = vfo; upAbsolute = obj.gameObject.transform.forward; }
+
+            upAbsolute = max.y >= 0 ? upAbsolute : -upAbsolute;
+        }
+        return upAbsolute;
+    }
+    //-------------------------------------------------
+    // Verifying the ray projection of the stack
+    //-------------------------------------------------
     public void ProjectStackable(Stackable obj, int listSize) {
 
-        var pS = obj.VisualRepresentation.GetComponent<Grab>().pointsSuggestion;        
+        var pS = obj.VisualRepresentation.GetComponent<Grab>().pointsSuggestion;
 
-        Matrix4x4 objMat = Matrix4x4.TRS(obj.gameObject.transform.position, obj.gameObject.transform.rotation, Vector3.one);
+        Vector3 upAbsolute = UpperDirecction(obj);
+
+        Quaternion objQua = Quaternion.FromToRotation(obj.gameObject.transform.up, upAbsolute) * obj.gameObject.transform.rotation;
+        Matrix4x4 objMat = Matrix4x4.TRS(obj.gameObject.transform.position, objQua, Vector3.one);
 
         foreach (var point in pS) {
             RaycastHit[] hits;
-            var down = obj.gameObject.transform.up;
-            down.y = -down.y;
-
+            var down = -upAbsolute;
             Vector3 pointF = objMat.MultiplyPoint3x4(point);
 
-            hits = Physics.RaycastAll(pointF, down, 100.0F);
-
-            //Debug.Log( hits.Length + " " + listSize);
+            hits = Physics.RaycastAll(pointF, down, 1F);
+            //Debug.Log(obj + " "+hits.Length + " " + listSize);
 
             if (hits.Length == listSize)
-                DrawPoint(obj.VisualRepresentation, pointF);
+                DrawPoint(obj.VisualRepresentation, objQua, pointF);
         }
-
     }
-    /*
-    GameObject threeDSquare = new GameObject("3DSquare");
-    threeDSquare.AddComponent<MeshRenderer>();
-    threeDSquare.AddComponent<MeshFilter>();
-
-    Mesh mesh = new Mesh();
-    mesh.vertices = theVertices.ToArray();
-    //mesh.uv = uvs.ToArray();
-    //mesh.triangles = tris.ToArray();
-    //mesh.RecalculateNormals();
-    threeDSquare.GetComponent<MeshFilter>().mesh = mesh;*/
-
-    /*
-    float m = (pointMaxCube.z - point6.z) / (pointMaxCube.x - point6.x);
-    for (float x = point6.x; x < pointMaxCube.x; x += step) {
-        float z = m * (x - point6.x) + point6.z;
-         DrawPoint(new Vector3(x, pointMaxCube.y, z));
-    }
-
-
-    float m2 = (point4.x - point6.x) / (point4.z - point6.z);
-    Debug.Log(point6.z + " " + point4.z);
-    for (float z = point6.z; z > point4.z; z -= step)
-    {
-
-        float x = m2 * (z - point6.z) + point6.x;
-        DrawPoint(new Vector3(x, pointMaxCube.y, z));
-
-    }*/
-
-
-
-
-    public void DrawPoint(GameObject obj, Vector3 point)
+    //-------------------------------------------------
+    // Draw suggestion to stack correctly
+    //-------------------------------------------------
+    public void DrawPoint(GameObject obj,Quaternion rotation, Vector3 point)
     {
         var sphere1cube = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
         sphere1cube.GetComponent<Collider>().enabled = false;
+        sphere1cube.transform.rotation = rotation;
         sphere1cube.transform.position = point;
-        var scale = new Vector3(0.002f, 0.0002f, 0.002f);
+        var scale = new Vector3(0.002f, 0.00005f, 0.002f);
         sphere1cube.transform.localScale = scale;
-        sphere1cube.GetComponent<MeshRenderer>().material.SetColor("_Color", hoverColor);
+        sphere1cube.GetComponent<MeshRenderer>().material.SetColor("_Color", Color.green);
         sphere1cube.transform.parent = obj.GetComponent<Grab>().drawnPoints.transform;
     }
+    //-------------------------------------------------
+    // Draw axis objects
+    //-------------------------------------------------
+    public void DrawCenter()
+    {
+        Vector3 upAbsolute = UpperDirecction(logicObject.GetComponent<Stackable>());
+        Quaternion rotation = Quaternion.FromToRotation(transform.up, upAbsolute) * transform.rotation;
 
+        center = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+        center.transform.position = transform.position;
+        center.transform.rotation = rotation;
+        center.transform.localScale = new Vector3(0.005f, transform.localScale.y + 0.04f, 0.005f);
+        center.GetComponent<Collider>().enabled = false;
+        center.GetComponent<MeshRenderer>().material.SetColor("_Color", Color.green);
+        center.transform.parent = this.gameObject.transform;
+    }
+
+    //-------------------------------------------------
+    // Called when a Hand starts hovering over this object
+    //-------------------------------------------------
+    private void OnHandHoverBegin(Hand hand)
+    {
+        this.GetComponent<MeshRenderer>().material.SetColor("_Color", hoverColor);
+
+        //*
+        allStacks.Clear();
+        var allObjects = GameObject.FindObjectsOfType<Stackable>();
+        foreach (var obj in allObjects)
+        {
+            //if (hand.gameObject.GetComponentInChildren<SimpleSpring>() != null && hand.gameObject.GetComponentInChildren<SimpleSpring>().logic.name.Equals(obj.name)) continue;
+            obj.VisualRepresentation.GetComponent<Grab>().drawnPoints = new GameObject();
+            obj.VisualRepresentation.GetComponent<Grab>().drawnPoints.transform.parent = obj.VisualRepresentation.gameObject.transform;
+            if (obj.baseStackable == null || !obj.baseStackable.name.Equals("Podium")) continue;
+            List<Stackable> stack = new List<Stackable>();
+            stack.Add(obj);
+            FindAboveObjects(obj, ref stack);
+            allStacks.Add(stack);
+        }
+
+        foreach (var list in allStacks)
+        {
+            ProjectStackable(list[list.Count - 1], list.Count);
+        }
+
+        DrawCenter();
+    }
 
     //-------------------------------------------------
     // Called when a Hand stops hovering over this object
@@ -165,18 +193,12 @@ public class Grab : MonoBehaviour {
     private void OnHandHoverEnd(Hand hand) {
         this.GetComponent<Renderer>().material.SetColor("_Color", materialOriginalColor);        
         Destroy(center);
+        /*
+        var allObjects = GameObject.FindObjectsOfType<Stackable>();
+        foreach (var obj in allObjects)
+            Destroy(obj.VisualRepresentation.GetComponent<Grab>().drawnPoints);//*/
         
-    }    
 
-    public void DrawCenter()
-    {
-        center = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-        center.transform.position = transform.position;
-        center.transform.rotation = transform.rotation;
-        center.transform.localScale = new Vector3(0.005f, transform.localScale.y + 0.04f, 0.005f);
-        center.GetComponent<Collider>().enabled = false;
-        center.GetComponent<Renderer>().material.SetColor("_Color", Color.green);
-        center.transform.parent = this.gameObject.transform;
     }
 
     //-------------------------------------------------
