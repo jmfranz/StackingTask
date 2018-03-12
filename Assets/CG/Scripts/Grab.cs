@@ -66,7 +66,7 @@ public class Grab : MonoBehaviour {
     public void CreateUpperBoundArea() {
         
         var boundMid = gameObject.transform.localScale/2;
-        float step = 0.004f;
+        float step = 0.01f;
 
         Matrix4x4 objMat = Matrix4x4.TRS(gameObject.transform.position, gameObject.transform.rotation, Vector3.one);
 
@@ -161,31 +161,31 @@ public class Grab : MonoBehaviour {
     //-------------------------------------------------
     // Called when a Hand starts hovering over this object
     //-------------------------------------------------
-    private void OnHandHoverBegin(Hand hand)
+    private void OnHandHoverBegin(Hand hand) { 
         if (logicObject.GetComponent<Stackable>().baseStackable == null) return;
         this.GetComponent<MeshRenderer>().material.SetColor("_Color", hoverColor);
 
         //*
-        allStacks.Clear();
-        var allObjects = GameObject.FindObjectsOfType<Stackable>();
-        foreach (var obj in allObjects)
-        {
-            //if (hand.gameObject.GetComponentInChildren<SimpleSpring>() != null && hand.gameObject.GetComponentInChildren<SimpleSpring>().logic.name.Equals(obj.name)) continue;
-            obj.VisualRepresentation.GetComponent<Grab>().drawnPoints = new GameObject();
-            obj.VisualRepresentation.GetComponent<Grab>().drawnPoints.transform.parent = obj.VisualRepresentation.gameObject.transform;
-            if (obj.baseStackable == null || !obj.baseStackable.name.Equals("Podium")) continue;
-            List<Stackable> stack = new List<Stackable>();
-            stack.Add(obj);
-            FindAboveObjects(obj, ref stack);
-            allStacks.Add(stack);
-        }
+        //allStacks.Clear();
+        //var allObjects = GameObject.FindObjectsOfType<Stackable>();
+        //foreach (var obj in allObjects)
+        //{
+        //    //if (hand.gameObject.GetComponentInChildren<SimpleSpring>() != null && hand.gameObject.GetComponentInChildren<SimpleSpring>().logic.name.Equals(obj.name)) continue;
+        //    obj.VisualRepresentation.GetComponent<Grab>().drawnPoints = new GameObject();
+        //    obj.VisualRepresentation.GetComponent<Grab>().drawnPoints.transform.parent = obj.VisualRepresentation.gameObject.transform;
+        //    if (obj.baseStackable == null || !obj.baseStackable.name.Equals("Podium")) continue;
+        //    List<Stackable> stack = new List<Stackable>();
+        //    stack.Add(obj);
+        //    FindAboveObjects(obj, ref stack);
+        //    allStacks.Add(stack);
+        //}
 
-        foreach (var list in allStacks)
-        {
-            ProjectStackable(list[list.Count - 1], list.Count);
-        }
+        //foreach (var list in allStacks)
+        //{
+        //    ProjectStackable(list[list.Count - 1], list.Count);
+        //}
 
-        DrawCenter();
+        //DrawCenter();
     }
 
     //-------------------------------------------------
@@ -195,7 +195,7 @@ public class Grab : MonoBehaviour {
         if(hand.otherHand.currentAttachedObject)
         if (logicObject.GetComponent<Stackable>().baseStackable == null) return;
         this.GetComponent<Renderer>().material.SetColor("_Color", materialOriginalColor);        
-        Destroy(center);
+        //Destroy(center);
         /*
         var allObjects = GameObject.FindObjectsOfType<Stackable>();
         foreach (var obj in allObjects)
