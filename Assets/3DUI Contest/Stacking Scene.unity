@@ -607,9 +607,7 @@ GameObject:
   - component: {fileID: 247019350}
   - component: {fileID: 247019348}
   - component: {fileID: 247019347}
-  - component: {fileID: 247019349}
   - component: {fileID: 247019352}
-  m_Layer: 0
   m_Name: Cube Small
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -707,6 +705,7 @@ MonoBehaviour:
   hoverMat: {fileID: 2100000, guid: 1f5813bd333b8304fb7e6085da17ce32, type: 2}
   stackList: []
   qntObjsAbove: 0
+  pointsSuggestion: []
 --- !u!4 &259538155 stripped
 Transform:
   m_PrefabParentObject: {fileID: 400000, guid: c128cfddd0d6223408275abae1dc8f37, type: 3}
@@ -903,7 +902,7 @@ GameObject:
   - component: {fileID: 309893617}
   - component: {fileID: 309893616}
   - component: {fileID: 309893615}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Podium
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1861,7 +1860,7 @@ GameObject:
   - component: {fileID: 617310457}
   - component: {fileID: 617310459}
   - component: {fileID: 617310458}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Platform
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2444,9 +2443,7 @@ GameObject:
   - component: {fileID: 810259480}
   - component: {fileID: 810259478}
   - component: {fileID: 810259477}
-  - component: {fileID: 810259479}
   - component: {fileID: 810259482}
-  m_Layer: 0
   m_Name: Cube Medium
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2544,6 +2541,7 @@ MonoBehaviour:
   hoverMat: {fileID: 2100000, guid: 1f5813bd333b8304fb7e6085da17ce32, type: 2}
   stackList: []
   qntObjsAbove: 0
+  pointsSuggestion: []
 --- !u!1001 &823233161
 Prefab:
   m_ObjectHideFlags: 0
@@ -2854,7 +2852,7 @@ GameObject:
   - component: {fileID: 1031106719}
   - component: {fileID: 1031106720}
   - component: {fileID: 1031106716}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Cube Large
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2909,6 +2907,7 @@ MonoBehaviour:
   hoverMat: {fileID: 2100000, guid: 1f5813bd333b8304fb7e6085da17ce32, type: 2}
   stackList: []
   qntObjsAbove: 0
+  pointsSuggestion: []
 --- !u!33 &1031106717
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -3006,7 +3005,7 @@ GameObject:
   - component: {fileID: 1071414971}
   - component: {fileID: 1071414974}
   - component: {fileID: 1071414970}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Platform
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3183,9 +3182,7 @@ GameObject:
   - component: {fileID: 1115653747}
   - component: {fileID: 1115653745}
   - component: {fileID: 1115653744}
-  - component: {fileID: 1115653746}
   - component: {fileID: 1115653749}
-  m_Layer: 0
   m_Name: Cylinder Small
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3285,6 +3282,7 @@ MonoBehaviour:
   hoverMat: {fileID: 2100000, guid: 1f5813bd333b8304fb7e6085da17ce32, type: 2}
   stackList: []
   qntObjsAbove: 0
+  pointsSuggestion: []
 --- !u!1001 &1146324443
 Prefab:
   m_ObjectHideFlags: 0
@@ -3403,9 +3401,7 @@ GameObject:
   - component: {fileID: 1190754649}
   - component: {fileID: 1190754647}
   - component: {fileID: 1190754646}
-  - component: {fileID: 1190754648}
   - component: {fileID: 1190754651}
-  m_Layer: 0
   m_Name: Cylinder Medium
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3505,6 +3501,7 @@ MonoBehaviour:
   hoverMat: {fileID: 2100000, guid: 1f5813bd333b8304fb7e6085da17ce32, type: 2}
   stackList: []
   qntObjsAbove: 0
+  pointsSuggestion: []
 --- !u!1001 &1194295505
 Prefab:
   m_ObjectHideFlags: 0
@@ -4678,7 +4675,7 @@ GameObject:
   - component: {fileID: 1659664300}
   - component: {fileID: 1659664298}
   - component: {fileID: 1659664299}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Podium
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -6245,7 +6242,6 @@ GameObject:
   - component: {fileID: 2146698844}
   - component: {fileID: 2146698842}
   - component: {fileID: 2146698841}
-  - component: {fileID: 2146698843}
   - component: {fileID: 2146698846}
   m_Layer: 0
   m_Name: Cylinder Large
@@ -6347,3 +6343,4 @@ MonoBehaviour:
   hoverMat: {fileID: 2100000, guid: 1f5813bd333b8304fb7e6085da17ce32, type: 2}
   stackList: []
   qntObjsAbove: 0
+  pointsSuggestion: []

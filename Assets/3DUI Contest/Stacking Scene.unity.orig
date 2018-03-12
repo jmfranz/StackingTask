@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.18028378, g: 0.22571412, b: 0.30692285, a: 1}
+  m_IndirectSpecularColor: {r: 0.18028334, g: 0.2257134, b: 0.30692226, a: 1}
 --- !u!157 &3
 LightmapSettings:
   m_ObjectHideFlags: 0
@@ -256,13 +256,13 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 87534146}
-  m_LocalRotation: {x: 0.8890527, y: -0.28964514, z: 0.35408136, w: -0.017818136}
-  m_LocalPosition: {x: 0.0894, y: 1.249, z: -0.09200003}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -0.35, y: 1.1, z: -0.35}
   m_LocalScale: {x: 0.05, y: 0.05, z: 0.05}
   m_Children: []
   m_Father: {fileID: 2071905324}
   m_RootOrder: 2
-  m_LocalEulerAnglesHint: {x: 9.988001, y: 499.476, z: -147.60501}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &87534148
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -606,10 +606,14 @@ GameObject:
   - component: {fileID: 247019351}
   - component: {fileID: 247019350}
   - component: {fileID: 247019348}
-  - component: {fileID: 247019352}
-  - component: {fileID: 247019349}
   - component: {fileID: 247019347}
+<<<<<<< HEAD
+  - component: {fileID: 247019349}
+  - component: {fileID: 247019352}
+  m_Layer: 0
+=======
   m_Layer: 2
+>>>>>>> StackingSuggestion
   m_Name: Cube Small
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -684,13 +688,13 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 247019346}
-  m_LocalRotation: {x: 0.8890527, y: -0.28964514, z: 0.35408136, w: -0.017818136}
-  m_LocalPosition: {x: 0.0894, y: 1.249, z: -0.092}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -0.35, y: 1.1, z: -0.35}
   m_LocalScale: {x: 0.05, y: 0.05, z: 0.05}
   m_Children: []
   m_Father: {fileID: 1081815335}
   m_RootOrder: 2
-  m_LocalEulerAnglesHint: {x: 9.988001, y: 499.476, z: -147.60501}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &247019352
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -707,6 +711,10 @@ MonoBehaviour:
   hoverMat: {fileID: 2100000, guid: 1f5813bd333b8304fb7e6085da17ce32, type: 2}
   stackList: []
   qntObjsAbove: 0
+<<<<<<< HEAD
+=======
+  pointsSuggestion: []
+>>>>>>> StackingSuggestion
 --- !u!4 &259538155 stripped
 Transform:
   m_PrefabParentObject: {fileID: 400000, guid: c128cfddd0d6223408275abae1dc8f37, type: 3}
@@ -1413,8 +1421,8 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 422219752}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.105, y: 1.257, z: 0.175}
-  m_LocalScale: {x: 0.15, y: 0.075, z: 0.15}
+  m_LocalPosition: {x: 0.35000002, y: 1.1, z: 0.35}
+  m_LocalScale: {x: 0.14999999, y: 0.074999996, z: 0.14999999}
   m_Children: []
   m_Father: {fileID: 2071905324}
   m_RootOrder: 3
@@ -2443,10 +2451,14 @@ GameObject:
   - component: {fileID: 810259481}
   - component: {fileID: 810259480}
   - component: {fileID: 810259478}
-  - component: {fileID: 810259482}
-  - component: {fileID: 810259479}
   - component: {fileID: 810259477}
+<<<<<<< HEAD
+  - component: {fileID: 810259479}
+  - component: {fileID: 810259482}
+  m_Layer: 0
+=======
   m_Layer: 2
+>>>>>>> StackingSuggestion
   m_Name: Cube Medium
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2521,8 +2533,8 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 810259476}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.07, y: 1.392, z: 0.147}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -0.35, y: 1.1, z: 0}
   m_LocalScale: {x: 0.1, y: 0.1, z: 0.1}
   m_Children: []
   m_Father: {fileID: 1081815335}
@@ -2544,6 +2556,10 @@ MonoBehaviour:
   hoverMat: {fileID: 2100000, guid: 1f5813bd333b8304fb7e6085da17ce32, type: 2}
   stackList: []
   qntObjsAbove: 0
+<<<<<<< HEAD
+=======
+  pointsSuggestion: []
+>>>>>>> StackingSuggestion
 --- !u!1001 &823233161
 Prefab:
   m_ObjectHideFlags: 0
@@ -2909,6 +2925,10 @@ MonoBehaviour:
   hoverMat: {fileID: 2100000, guid: 1f5813bd333b8304fb7e6085da17ce32, type: 2}
   stackList: []
   qntObjsAbove: 0
+<<<<<<< HEAD
+=======
+  pointsSuggestion: []
+>>>>>>> StackingSuggestion
 --- !u!33 &1031106717
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -2922,13 +2942,13 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1031106713}
-  m_LocalRotation: {x: -0.03044804, y: 0.34308532, z: -0.24757299, w: 0.90557885}
-  m_LocalPosition: {x: 0.073, y: 1.123, z: -0.098}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -0.35, y: 1.1, z: 0.35}
   m_LocalScale: {x: 0.15, y: 0.15, z: 0.15}
   m_Children: []
   m_Father: {fileID: 1081815335}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 6.5880003, y: 39.843002, z: -28.191002}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!65 &1031106719
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -3182,10 +3202,14 @@ GameObject:
   - component: {fileID: 1115653748}
   - component: {fileID: 1115653747}
   - component: {fileID: 1115653745}
-  - component: {fileID: 1115653749}
-  - component: {fileID: 1115653746}
   - component: {fileID: 1115653744}
+<<<<<<< HEAD
+  - component: {fileID: 1115653746}
+  - component: {fileID: 1115653749}
+  m_Layer: 0
+=======
   m_Layer: 2
+>>>>>>> StackingSuggestion
   m_Name: Cylinder Small
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3262,13 +3286,13 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1115653743}
-  m_LocalRotation: {x: 0.039689578, y: -0.005917547, z: -0.73223567, w: 0.6798682}
-  m_LocalPosition: {x: -0.0201, y: 1.037, z: -0.0909}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0.35000002, y: 1.1, z: -0.35}
   m_LocalScale: {x: 0.05, y: 0.025, z: 0.05}
   m_Children: []
   m_Father: {fileID: 1081815335}
   m_RootOrder: 5
-  m_LocalEulerAnglesHint: {x: 2.5960002, y: -3.798, z: -94.33401}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1115653749
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3285,6 +3309,10 @@ MonoBehaviour:
   hoverMat: {fileID: 2100000, guid: 1f5813bd333b8304fb7e6085da17ce32, type: 2}
   stackList: []
   qntObjsAbove: 0
+<<<<<<< HEAD
+=======
+  pointsSuggestion: []
+>>>>>>> StackingSuggestion
 --- !u!1001 &1146324443
 Prefab:
   m_ObjectHideFlags: 0
@@ -3402,10 +3430,14 @@ GameObject:
   - component: {fileID: 1190754650}
   - component: {fileID: 1190754649}
   - component: {fileID: 1190754647}
-  - component: {fileID: 1190754651}
-  - component: {fileID: 1190754648}
   - component: {fileID: 1190754646}
+<<<<<<< HEAD
+  - component: {fileID: 1190754648}
+  - component: {fileID: 1190754651}
+  m_Layer: 0
+=======
   m_Layer: 2
+>>>>>>> StackingSuggestion
   m_Name: Cylinder Medium
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3482,13 +3514,13 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1190754645}
-  m_LocalRotation: {x: -0.9976095, y: -0, z: -0, w: 0.069103494}
-  m_LocalPosition: {x: -0.0721, y: 1.497, z: 0.1496}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0.35000002, y: 1.1, z: 0}
   m_LocalScale: {x: 0.1, y: 0.05, z: 0.1}
   m_Children: []
   m_Father: {fileID: 1081815335}
   m_RootOrder: 4
-  m_LocalEulerAnglesHint: {x: -172.075, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1190754651
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3505,6 +3537,10 @@ MonoBehaviour:
   hoverMat: {fileID: 2100000, guid: 1f5813bd333b8304fb7e6085da17ce32, type: 2}
   stackList: []
   qntObjsAbove: 0
+<<<<<<< HEAD
+=======
+  pointsSuggestion: []
+>>>>>>> StackingSuggestion
 --- !u!1001 &1194295505
 Prefab:
   m_ObjectHideFlags: 0
@@ -3847,8 +3883,8 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1320008170}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.07, y: 1.392, z: 0.147}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -0.35, y: 1.1, z: 0}
   m_LocalScale: {x: 0.1, y: 0.1, z: 0.1}
   m_Children: []
   m_Father: {fileID: 2071905324}
@@ -4248,13 +4284,13 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1452364391}
-  m_LocalRotation: {x: -0.9976095, y: -0, z: -0, w: 0.069103494}
-  m_LocalPosition: {x: -0.0721, y: 1.497, z: 0.1496}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0.35000002, y: 1.1, z: 0}
   m_LocalScale: {x: 0.1, y: 0.05, z: 0.1}
   m_Children: []
   m_Father: {fileID: 2071905324}
   m_RootOrder: 4
-  m_LocalEulerAnglesHint: {x: -172.075, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1452364393
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4329,13 +4365,13 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1467942082}
-  m_LocalRotation: {x: 0.039689578, y: -0.005917547, z: -0.73223567, w: 0.6798682}
-  m_LocalPosition: {x: -0.0201, y: 1.037, z: -0.0909}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0.35000002, y: 1.1, z: -0.35}
   m_LocalScale: {x: 0.05, y: 0.025, z: 0.05}
   m_Children: []
   m_Father: {fileID: 2071905324}
   m_RootOrder: 5
-  m_LocalEulerAnglesHint: {x: 2.5960002, y: -3.798, z: -94.33401}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1467942084
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5334,13 +5370,13 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1833841822}
-  m_LocalRotation: {x: -0.03044804, y: 0.34308532, z: -0.24757299, w: 0.90557885}
-  m_LocalPosition: {x: 0.073, y: 1.123, z: -0.098000005}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -0.35, y: 1.1, z: 0.35}
   m_LocalScale: {x: 0.15, y: 0.15, z: 0.15}
   m_Children: []
   m_Father: {fileID: 2071905324}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 6.5880003, y: 39.843002, z: -28.191002}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1833841824
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6244,10 +6280,14 @@ GameObject:
   - component: {fileID: 2146698845}
   - component: {fileID: 2146698844}
   - component: {fileID: 2146698842}
-  - component: {fileID: 2146698846}
-  - component: {fileID: 2146698843}
   - component: {fileID: 2146698841}
+<<<<<<< HEAD
+  - component: {fileID: 2146698843}
+  - component: {fileID: 2146698846}
+  m_Layer: 0
+=======
   m_Layer: 2
+>>>>>>> StackingSuggestion
   m_Name: Cylinder Large
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -6325,7 +6365,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 2146698840}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.105, y: 1.257, z: 0.175}
+  m_LocalPosition: {x: 0.35000002, y: 1.1, z: 0.35}
   m_LocalScale: {x: 0.15, y: 0.075, z: 0.15}
   m_Children: []
   m_Father: {fileID: 1081815335}
@@ -6347,3 +6387,7 @@ MonoBehaviour:
   hoverMat: {fileID: 2100000, guid: 1f5813bd333b8304fb7e6085da17ce32, type: 2}
   stackList: []
   qntObjsAbove: 0
+<<<<<<< HEAD
+=======
+  pointsSuggestion: []
+>>>>>>> StackingSuggestion

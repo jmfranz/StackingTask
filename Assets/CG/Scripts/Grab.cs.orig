@@ -20,12 +20,15 @@ public class Grab : MonoBehaviour {
     private Color hoverColor, selectColor;
 
     public int qntObjsAbove = 0;
+<<<<<<< HEAD
+    
+=======
     List<List<Stackable>> allStacks = new List<List<Stackable>>();
     private List<Vector3> pointsSuggestion = new List<Vector3>();
 
     private GameObject drawnPoints;
     private GameObject center;
-    
+>>>>>>> StackingSuggestion
 
     //-------------------------------------------------
     void Awake() {
@@ -36,6 +39,10 @@ public class Grab : MonoBehaviour {
         materialOriginalColor = GetComponent<Renderer>().material.color;
         hoverColor = new Color(0.7f, 1.0f, 0.7f, 1.0f);
         selectColor = new Color(0.1f, 1.0f, 0.1f, 1.0f);
+<<<<<<< HEAD
+        //Find the equivalent logic obj
+        logicObject = GameObject.Find(this.transform.name + " Logic");
+=======
         logicObject = GameObject.Find(this.transform.name + " Logic");
         
         CreateUpperBoundArea();
@@ -102,6 +109,7 @@ public class Grab : MonoBehaviour {
             upAbsolute = max.y >= 0 ? upAbsolute : -upAbsolute;
         }
         return upAbsolute;
+>>>>>>> StackingSuggestion
     }
     //-------------------------------------------------
     // Verifying the ray projection of the stack
@@ -161,8 +169,13 @@ public class Grab : MonoBehaviour {
     //-------------------------------------------------
     // Called when a Hand starts hovering over this object
     //-------------------------------------------------
-    private void OnHandHoverBegin(Hand hand)
+<<<<<<< HEAD
+    private void OnHandHoverBegin(Hand hand) {
         if (logicObject.GetComponent<Stackable>().baseStackable == null) return;
+=======
+    private void OnHandHoverBegin(Hand hand)
+    {
+>>>>>>> StackingSuggestion
         this.GetComponent<MeshRenderer>().material.SetColor("_Color", hoverColor);
 
         //*
@@ -192,8 +205,12 @@ public class Grab : MonoBehaviour {
     // Called when a Hand stops hovering over this object
     //-------------------------------------------------
     private void OnHandHoverEnd(Hand hand) {
+<<<<<<< HEAD
         if(hand.otherHand.currentAttachedObject)
         if (logicObject.GetComponent<Stackable>().baseStackable == null) return;
+        this.GetComponent<Renderer>().material.SetColor("_Color", materialOriginalColor);
+    }
+=======
         this.GetComponent<Renderer>().material.SetColor("_Color", materialOriginalColor);        
         Destroy(center);
         /*
@@ -201,6 +218,7 @@ public class Grab : MonoBehaviour {
         foreach (var obj in allObjects)
             Destroy(obj.VisualRepresentation.GetComponent<Grab>().drawnPoints);//*/
         
+>>>>>>> StackingSuggestion
 
     }
 
@@ -212,7 +230,24 @@ public class Grab : MonoBehaviour {
         if (hand.GetStandardInteractionButtonDown()) {// || ((hand.controller != null) && hand.controller.GetPressDown(Valve.VR.EVRButtonId.k_EButton_Grip))) {
             if (hand.currentAttachedObject != gameObject) {
 
+<<<<<<< HEAD
+                hand.controller.TriggerHapticPulse();
+                this.GetComponent<Renderer>().material.SetColor("_Color", selectColor);
 
+
+                // Check if the other hand has objects attached. 
+                // If so, we need to find out if the other hand is grabbing the object grabbed with this hand.
+                // If it is been grabbed, we need to remove the joint that is fixing it to the other hand and attach to this hand.
+                if (hand.otherHand.gameObject.GetComponentInChildren<SimpleSpring>() != null) { //if the other hand is grabbing an object
+                    //Find this object in the other hand
+                    var otherHandObj = hand.otherHand.gameObject.GetComponentInChildren<SimpleSpring>().logic;
+                    DetachFromOtherHand(logicObject, otherHandObj);
+                }
+                qntObjsAbove = 0;  
+                AttachAboveObjects(logicObject.GetComponent<Stackable>(), ref qntObjsAbove);
+
+=======
+>>>>>>> StackingSuggestion
                 //Instantiate and imaginary god-object
                 imaginary = Instantiate(imaginaryPrefab);
 
@@ -323,7 +358,10 @@ public class Grab : MonoBehaviour {
 
             Destroy(imaginary);
             Destroy(logicObject.GetComponent<NotifyCollision>());
+<<<<<<< HEAD
             
+=======
+
             if (hand.otherHand.gameObject.GetComponentInChildren<SimpleSpring>() == null) {
                 var allObjects = GameObject.FindObjectsOfType<Stackable>();
                 foreach (var obj in allObjects)
@@ -332,6 +370,8 @@ public class Grab : MonoBehaviour {
 
             Destroy(center);
 
+            this.GetComponent<Renderer>().material.SetColor("_Color", hoverColor);
+>>>>>>> StackingSuggestion
 
             // Detach this object from the hand
             hand.DetachObject(imaginary);
